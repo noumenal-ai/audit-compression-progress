@@ -37,7 +37,8 @@ def load_notebook_core():
                 exec(compile("".join(c["source"]), "<audit_cp_report.ipynb>", "exec"), ns)
     for required in ("declare_panel", "compute_slack", "five_numbers", "audit_cp_report",
                      "reconcile_increments", "check_independent_units", "resolution_before_run",
-                     "panel_size_for_resolution", "PanelSteeredError"):
+                     "panel_size_for_resolution", "PanelSteeredError", "DependentUnitError",
+                     "WeightedEstimatorError", "effective_n", "UNWEIGHTED_MEAN", "WEIGHTED_MEAN"):
         assert required in ns, "notebook core is missing %s" % required
     return ns
 
@@ -52,6 +53,16 @@ check_independent_units = NB["check_independent_units"]
 resolution_before_run = NB["resolution_before_run"]
 panel_size_for_resolution = NB["panel_size_for_resolution"]
 PanelSteeredError = NB["PanelSteeredError"]
+DependentUnitError = NB["DependentUnitError"]
+effective_n = NB["effective_n"]
+UNWEIGHTED_MEAN = NB["UNWEIGHTED_MEAN"]
+
+# One value per passage, averaged unweighted over the 5153 passages: score_states.py writes
+# out["loss_passage"][i] and out["loss_target"][i] as that passage's own mean over its scored
+# tokens, and the panel level is their unweighted mean. That is the estimator route (c)'s
+# Delta = R*sqrt(ln(2N/delta)/(2n)) prices exactly. Pooling instead -- total loss over total
+# tokens -- would be a token-weighted mean and would need an n_eff correction.
+AUDIT_UNIT_KIND = "passage"
 
 
 def transcript_budget_for_gain(*, gain, n, R, delta):
@@ -149,7 +160,9 @@ def build_target(t):
     V = STATE_META[t["pT"]]["V"]
     L_ref_per_unit = math.log(V)                        # uniform code over the same label set
     loss_ref = np.full(N_UNITS, L_ref_per_unit)
-    slack = compute_slack("c", provenance=t["panel"], n=N_UNITS, R=R, delta=DELTA, N=N)
+    slack = compute_slack("c", provenance=t["panel"], n=N_UNITS, R=R, delta=DELTA, N=N,
+                          unit_kind=AUDIT_UNIT_KIND, n_records=N_UNITS,
+                          estimator=UNWEIGHTED_MEAN)
     l0, lT = arr(t["p0"], t["metric"]), arr(t["pT"], t["metric"])
     fn = five_numbers(loss_ref, l0, lT, slack, R=R)
 
@@ -162,6 +175,7 @@ def build_target(t):
         audit_unit=("one LAMBADA-OpenAI passage; loss is the mean over the scored tokens of that "
                     "passage of -ln((1-0.01)p + 0.01/%d)" % V),
         n_independent_units=N_UNITS,
+        estimator=UNWEIGHTED_MEAN,
         R=R,
         commitment_record={
             "state_commitment": "hf revisions %s -> %s" % (
@@ -336,7 +350,7 @@ def main():
     print("panel file sha256: %s" % META["panel_sha256"])
     print("declaration sha256: %s" % META["declaration_sha256"])
     print()
-    check_independent_units(N_UNITS, "example", n_records=N_UNITS)
+    check_independent_units(N_UNITS, AUDIT_UNIT_KIND, n_records=N_UNITS)
     print()
 
     targets = [b for b in (build_target(t) for t in TARGETS) if b is not None]

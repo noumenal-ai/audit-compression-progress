@@ -84,6 +84,15 @@ a uniform quote returns the same quote. Hence `L_Q(p_ref) = ln V` exactly on eve
 425,000 GPT-2 tokens; tokens inside a passage are dependent, so `n = 5153`. Section 7 prices exactly
 what the other choice would have bought.
 
+**The panel level is the unweighted mean of the 5153 per-passage values.** `score_states.py` writes
+one number per passage, that passage's own mean over its scored tokens, and the level is the plain
+mean of those. It is not the pooled ratio: total loss over total tokens would weight a 200-token
+passage twenty times a 10-token one, which is a weighted mean `sum_i w_i m_i` whose Hoeffding radius
+is `Delta * sqrt(n / n_eff)` rather than `Delta`, with `n_eff = (sum_i c_i)^2 / sum_i c_i^2 <= n`.
+Passage lengths here vary by more than an order of magnitude, so the two differ; `Delta` below is
+the right radius because the estimator is the unweighted one. `report.py` declares
+`estimator="unweighted_mean_of_unit_losses"` and the notebook checks it against the slack's.
+
 Two loss functions are declared on the panel, and both are reported for both comparisons:
 
 - **final word** (`loss_target`): the mean, over the BPE tokens of the passage's final word, of

@@ -70,9 +70,46 @@ panel = (rng.integers(0, C, (40, G, G)), rng.integers(0, C, (40, G, G)),
          rng.integers(0, NT, (40,)))
 model = M.TaskConditionedCNN(n_tasks=NT, n_colors=C, grid_size=G).to(dev)
 ap = M.audit_panel_loss(model, panel, dev)
-assert set(ap) >= {"floored_ce", "cell_acc", "active_cell_acc", "exact_grid_acc"}
+assert set(ap) >= {"floored_ce", "floored_ce_per_example", "n_examples", "sum_cells",
+                   "sum_cells_sq", "n_effective", "cell_acc", "active_cell_acc",
+                   "exact_grid_acc"}
 assert 0 <= ap["floored_ce"] <= R + 1e-4 and 0 <= ap["cell_acc"] <= 1
+# The unweighted per-example level is bounded by the same R, and the effective sample size of the
+# cell-weighted level is at most the number of examples (Cauchy-Schwarz), with equality only when
+# every example carries the same number of content cells.
+assert 0 <= ap["floored_ce_per_example"] <= R + 1e-4
+assert ap["n_examples"] == panel[0].shape[0]
+assert 0 < ap["n_effective"] <= ap["n_examples"] + 1e-6, \
+    f"n_effective {ap['n_effective']} exceeds n {ap['n_examples']}"
+assert abs(ap["n_effective"] - ap["sum_cells"] ** 2 / ap["sum_cells_sq"]) < 1e-6
+_uniform = M.audit_panel_loss(
+    model, (panel[0], np.zeros_like(panel[1]), panel[2]), dev)          # every cell is content
+assert abs(_uniform["n_effective"] - _uniform["n_examples"]) < 1e-6, \
+    "equal cell counts must give n_eff = n"
+assert abs(_uniform["floored_ce"] - _uniform["floored_ce_per_example"]) < 1e-5, \
+    "equal cell counts must make the weighted and unweighted levels agree"      # float32 accum
 print(f"  audit_panel_loss { {k: round(v,3) for k,v in ap.items()} } OK")
+
+# Unequal content-cell counts: the ARC-TGI case, where a padded canvas holds grids of different
+# sizes. n_eff has to fall strictly below n, and the two panel levels have to come apart.
+_pad = 10
+_y = np.full_like(panel[1], _pad)
+for _i in range(_y.shape[0]):
+    _side = 2 + (_i % (G - 1))                                          # sides 2..G
+    _y[_i, :_side, :_side] = panel[1][_i, :_side, :_side] % _pad        # content, never the pad
+_saved_ig, M.AUDIT_IGNORE_INDEX = M.AUDIT_IGNORE_INDEX, _pad
+try:
+    _var = M.audit_panel_loss(model, (panel[0], _y, panel[2]), dev)
+finally:
+    M.AUDIT_IGNORE_INDEX = _saved_ig
+assert _var["n_effective"] < _var["n_examples"] - 1e-6, \
+    "unequal cell counts must give n_eff strictly below n"
+assert abs(_var["floored_ce"] - _var["floored_ce_per_example"]) > 1e-4, \
+    "unequal cell counts must separate the weighted and unweighted levels"
+print(f"  varying grid sizes: n_eff {_var['n_effective']:.2f} / n {_var['n_examples']} "
+      f"(radius inflation {math.sqrt(_var['n_examples']/_var['n_effective']):.3f}), "
+      f"cell-weighted {_var['floored_ce']:.4f} vs per-example "
+      f"{_var['floored_ce_per_example']:.4f} OK")
 
 # ---- 5. schedulers ----
 k = NT

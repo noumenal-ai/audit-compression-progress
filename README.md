@@ -8,6 +8,8 @@ Signed compression progress measured on a fixed, sealed audit loss telescopes to
 
 - **`AuditCP/`**: the machine-checked core (Lean 4 / Mathlib). Self-contained, with Mathlib as the only build dependency, pinned to an exact commit. Telescoping, the finite-audit `2*Delta_n` bound, finite Gibbs, and the conditional entropy floor are fully proved and axiom-audited. See [`AuditCP/README.md`](AuditCP/README.md).
 - **`experiments/`**: the ARC-TGI experiment code (curriculum reward ablation, finite-audit concentration, the adaptive scalar-feedback holdout attack with its release defenses, and the boundary witnesses), plus `results_data/` for measured data that the code reads back.
+- **`notebooks/`**: [`audit_cp_report.ipynb`](notebooks/audit_cp_report.ipynb), which turns three vectors of
+  per-audit-unit losses into the five reported numbers and the public report object.
 - **`examples/`**: the measurement applied to published results. [`examples/lambada-openai/`](examples/lambada-openai/) re-expresses GPT-2's LAMBADA table and a Pythia-160m training run in the five numbers, on one sealed panel.
 - **`dist/`**: downloadable snapshots, `AuditCP_lean.zip` (the Lean project) and `auditcp_experiments.zip` (code plus per-seed result shards).
 
@@ -39,9 +41,15 @@ python3 e7_multiseed.py 20                               # 20-seed E7 power cali
 
 **Why it is a fixed-model measurement.** Panel `B` is scored exactly once per run, after the last training step. It never enters the reward loop: the per-step audit-CP reward reads panel `A`, and C1 has no early stopping, no checkpoint selection, and no hyperparameter or data selection driven by a panel-`B` score. Because the panel produced no signal that influenced training, the fixed-panel slack applies, with a declared candidate count of `N = 1` for the single pre-declared endpoint pair. Had any panel-`B` score steered training, that route would be invalid and the slack would have to be rebuilt from an honest count of the bits the panel leaked into the transcript.
 
-**Independent unit.** `n` counts audit *examples* (one padded 30x30 grid each), not cells. Cells within a grid are dependent, so the example is the conservative unit even though the loss is averaged over content cells.
+**Independent unit.** `n` counts audit *examples* (one padded 30x30 grid each), not cells. Cells within a grid are dependent, so the example is the conservative unit.
 
-**Aggregate over the 20 seeds** (nats; sd is the sample standard deviation, `ddof=1`):
+**Estimator, and what it costs.** The archived panel level is not the unweighted mean of 12,288 per-example losses. `audit_panel_loss` in `experiments/cp_models.py` returns the total floored cross-entropy over every content cell of the panel divided by the total content-cell count, which is a content-cell-weighted mean `sum_i w_i m_i` with `w_i = c_i / sum_j c_j`; it computes no per-example value, and ARC-TGI grids run from 1x1 to 30x30 inside the padded canvas, so the weights vary. Route (c)'s `Delta = R*sqrt(ln(2N/delta)/(2n))` is Hoeffding for an *unweighted* mean of `n` bounded terms. For the weighted level the radius is `Delta*sqrt(n/n_eff)` with `n_eff = (sum_i c_i)^2 / sum_i c_i^2`, and `n_eff <= n` always, so the published `Delta` below is too small for the estimator that produced these levels, in a fixed direction.
+
+The archived measurement stored no per-example cell counts, so `n_eff` cannot be recovered from this record and this repository does not publish a corrected number for it. What the record does fix is the threshold: `G > Gamma*sqrt(n/n_eff)` exactly while `n_eff > 2*R^2*ln(2N/delta)/G^2 = 289`, out of `n = 12288`. Since `n_eff >= n*mean(c)/max(c)` and `max(c) <= 900` on a 30x30 canvas, a panel averaging more than 21.2 content cells per example clears it on its own. Neither quantity is settled here.
+
+`cp_models.audit_panel_loss` now also returns `floored_ce_per_example` (the unweighted mean of per-example means, which route (c) prices exactly) together with `sum_cells`, `sum_cells_sq` and `n_effective`, and `c1_panelB_initial_loss.py` records them per seed, so a re-run measures both readings and pins `n_eff` down. The archived numbers predate that.
+
+**Aggregate over the 20 seeds** (nats; sd is the sample standard deviation, `ddof=1`). The lower bound and the ratio are the published route (c) arithmetic and are exact for the unweighted reading of the panel level; under the archived cell-weighted estimator they are conditional on `n_eff > 289`:
 
 | quantity | value |
 | --- | --- |
@@ -50,10 +58,13 @@ python3 e7_multiseed.py 20                               # 20-seed E7 power cali
 | mean signed gain `G` | 0.7366 (sd 0.0468) |
 | `Delta` | 0.056421 |
 | slack `Gamma = 2*Delta` | 0.112841 |
-| lower bound on improvement `G - Gamma` | 0.6237 |
-| discrimination ratio `G / Gamma` | 6.53 |
+| lower bound on improvement `G - Gamma` | 0.6237 (unweighted reading; conditional on `n_eff > 289` under the archived estimator) |
+| discrimination ratio `G / Gamma` | 6.53 (same condition) |
+| `n_eff` of the archived level | not recorded |
 
 The slack is `Delta = R * sqrt(ln(2N/delta) / (2n))` with `R = -ln 0.01 = 4.6052`, `delta = 0.05`, `N = 1`, `n = 12288`, and `Gamma = 2*Delta`, two-sided over the endpoints: an upper deviation at `theta_0` and a lower one at `theta_T`. The headline claim is the lower bound on improvement, `G - Gamma`; the discrimination ratio `G / Gamma` is dimensionless, comparable across substrates, and exceeds 1 exactly when that bound is positive.
+
+The notebook publishes this run's report object with `lower_bound_on_improvement` and `discrimination_ratio` set to `null` and a `bound_status` naming the estimator mismatch, rather than printing a number its slack does not cover. The unweighted arithmetic above is reported alongside, as arithmetic.
 
 Seed by seed the lower bound runs from 0.5266 to 0.6981 and is positive in 20 of 20 seeds. Each seed draws its own independent panel `B`, so that is the single-seed statement at `delta = 0.05` applied seed by seed, not a simultaneous 95% statement across all 20, which would need a union bound over seeds.
 
@@ -67,6 +78,37 @@ python3 c1_panelB_initial_loss.py --aggregate-only   # recompute the aggregate b
 ```
 
 The script rebuilds `theta_0` from the `run_c1` prefix, saves after every seed so an interrupted run resumes, and exits non-zero if the aggregate stops matching the values above. It reads `L_B(theta_T)` from `results_data/c1_seed<S>.json` when those shards have been unpacked, and otherwise straight out of `dist/auditcp_experiments.zip`.
+
+## Notebook: the five reported numbers
+
+`notebooks/audit_cp_report.ipynb` computes the report for a run: terminal level against the
+benchmark-owned reference, signed gain, slack, lower bound on improvement, and discrimination ratio,
+all in nats. It takes arrays of per-audit-unit losses rather than model objects, so it is
+framework-agnostic; the core needs only `numpy`, and an optional cell shows how to produce the arrays
+from a torch model.
+
+The notebook implements all four slack routes (complete verifier, fresh endpoints, fixed panel,
+reused panel with a bounded transcript) and enforces the three declarations they depend on, on the
+same call that computes the number.
+
+- **How the panel was used.** The fixed-panel route is refused for a panel whose scores steered
+  training. The declaration is immutable once made, a steering panel cannot declare fewer than one
+  released bit, and a route (c) or (d) slack carries the panel it was priced under, so it cannot be
+  assembled by hand around the check.
+- **What one audit unit is.** Every route that consumes an `n` refuses a declared unit that is a
+  sub-unit of a record (a token, a cell, a frame), and the report object refuses to publish under
+  one. The slack's `n`, the length of the loss vectors and the published unit count have to agree.
+- **Which estimator produced the level.** The routes price the unweighted mean of `n` per-record
+  losses. A level that pools sub-units across records is a weighted mean and needs `n_eff`;
+  declaring one without `n_eff` raises rather than falling back on the unweighted radius.
+
+It also sizes a panel to the improvement it has to resolve, and reproduces the ARC-TGI numbers from
+the paper under assertion, then prices what that run's archived estimator costs.
+
+```sh
+python3 -m pip install numpy jupyter
+jupyter notebook notebooks/audit_cp_report.ipynb
+```
 
 ## Example: a published result in the five numbers
 

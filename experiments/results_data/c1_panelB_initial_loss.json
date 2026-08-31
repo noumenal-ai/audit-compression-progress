@@ -7,7 +7,11 @@
     "name": "floored cross-entropy, content cells only (pad token excluded)",
     "units": "nats",
     "eps": 0.01,
-    "range_R": 4.605170185988091
+    "range_R": 4.605170185988091,
+    "estimator": "content_cell_weighted_ratio",
+    "estimator_definition": "sum over panel content cells of the floored CE, divided by the total content-cell count: a weighted mean of the per-example means with weights proportional to each example's content-cell count, not their unweighted mean",
+    "n_effective": null,
+    "priced_by_route_c_delta": false
   },
   "panel": {
     "name": "B",
@@ -19,10 +23,14 @@
   "theta_0": "freshly initialised network, zero optimiser steps; run_c1 re-seeds torch immediately before make_model, so all seven C1 policies share theta_0 at a given seed",
   "theta_T": "the audit_cp policy after 5000 steps; L_B(theta_T) is read back from results_data/c1_seed<S>.json -> c1.by_policy.audit_cp.final_fresh_floored_ce",
   "fields": {
-    "L0": "L_B(theta_0), the initial audit level",
-    "LT": "L_B(theta_T), the terminal audit level",
+    "L0": "L_B(theta_0), the initial audit level, content-cell-weighted",
+    "LT": "L_B(theta_T), the terminal audit level, content-cell-weighted",
     "G": "signed gain L0 - LT",
-    "n_panel": "independent audit units in panel B (examples, not cells)"
+    "n_panel": "independent audit units in panel B (examples, not cells)",
+    "L0_unweighted": "L_B(theta_0) as the unweighted mean of per-example means, which is what route (c)'s Delta prices; present only on rows re-measured after cp_models.audit_panel_loss began returning it",
+    "sum_cells": "sum_i c_i, content cells in panel B; re-measured rows only",
+    "sum_cells_sq": "sum_i c_i^2; re-measured rows only",
+    "n_effective": "(sum_i c_i)^2 / sum_i c_i^2; re-measured rows only"
   },
   "generated_by": "experiments/c1_panelB_initial_loss.py",
   "per_seed": {
@@ -353,6 +361,12 @@
     ],
     "n_independent_audit_units": 12288,
     "independent_unit": "example (one padded 30x30 ARC-TGI grid); NOT the cell",
+    "estimator": "content_cell_weighted_ratio",
+    "estimator_note": "L0 and LT are audit_panel_loss's floored_ce: total floored CE over every content cell of the panel divided by the total content-cell count. That is sum_i w_i m_i with w_i = c_i / sum_j c_j, not the unweighted mean of n per-example losses, and route (c)'s Delta is the radius of the unweighted mean. The corrected radius is Delta*sqrt(n/n_eff) with n_eff = (sum_i c_i)^2 / sum_i c_i^2 <= n, so Delta below is too small for this estimator whenever the grids differ in size, which they do.",
+    "n_effective": null,
+    "n_effective_note": "null: the archived measurement stored no per-example content-cell counts, so n_eff is not recoverable from this record. A re-run of c1_panelB_initial_loss.py stores sum_cells, sum_cells_sq and n_effective per seed, and L0_unweighted beside L0.",
+    "n_effective_required_for_positive_bound": 289,
+    "n_effective_required_note": "2*R^2*ln(2N/delta)/G^2 at the mean gain: the corrected lower bound stays positive for every n_eff above this, out of n = 12288 records. Since n_eff >= n*mean(c)/max(c) and max(c) <= 900 on a 30x30 canvas, a mean above 21.2 content cells per example is sufficient on its own. Neither quantity is settled by this record.",
     "loss_range_R": 4.605170185988091,
     "delta": 0.05,
     "candidate_set_size_N": 1,
@@ -379,6 +393,7 @@
     },
     "lower_bound_on_improvement": 0.6237138061118271,
     "discrimination_ratio": 6.527363734992242,
+    "bound_reading": "the lower bound and the ratio above are the published route (c) arithmetic and are exact for an unweighted mean of n per-example losses. The archived level is the cell-weighted ratio, so under that estimator the supported statement is conditional: the bound is positive exactly while n_eff > 289.",
     "per_seed_lower_bound": {
       "min": 0.5266284439479046,
       "max": 0.6980777447470131,

@@ -332,7 +332,7 @@ def run_e7(cfg: Cfg, attackers=("boosting", "sa", "es"),
 
 
 def run_e7_power_calibration(cfg: Cfg, n: int = 200, C: int = 10, Qs=(500, 2000, 8000)) -> Dict:
-    """Instrument-power certification = run_e7 at the DEGENERATE cells=1 panel (a structural
+    """Instrument-power calibration = run_e7 at the DEGENERATE cells=1 panel (a structural
     special case of the deployed instrument, not a separate/easier one). A capable boosting
     attacker memorizes random per-example labels via scalar feedback and must cross 2*Delta_n
     under naive release with the gap growing in Q; defenses must push it back below."""

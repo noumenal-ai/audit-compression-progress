@@ -318,14 +318,38 @@ class ConvICM(nn.Module):
 def audit_panel_loss(model: nn.Module, panel: Tuple[np.ndarray, np.ndarray, np.ndarray],
                      device: torch.device, eps: float = 0.01, batch_size: int = 256
                      ) -> Dict[str, float]:
-    """Mean floored-CE (bounded, the accounting metric) + reconstruction accuracies
-    over a held-out audit panel. Returns dict with floored_ce, cell_acc, active_cell_acc,
-    exact_grid_acc."""
+    """Floored-CE (bounded, the accounting metric) + reconstruction accuracies over a
+    held-out audit panel.
+
+    TWO panel levels are returned and they are not interchangeable.
+
+      floored_ce              total floored CE over every content cell of the panel, divided by
+                              the total content-cell count. This is a CONTENT-CELL-WEIGHTED ratio,
+                              sum_i w_i m_i with w_i = c_i / sum_j c_j: examples with larger grids
+                              count for more. It is the metric the archived runs used and is kept
+                              unchanged so those numbers stay reproducible.
+      floored_ce_per_example  the UNWEIGHTED mean over examples of each example's own mean floored
+                              CE. This is the quantity the route (c) radius
+                              Delta = R*sqrt(ln(2N/delta)/(2n)) actually covers, because that
+                              radius is Hoeffding for an unweighted mean of n bounded terms.
+
+    The two differ whenever the grids differ in size, which they do: ARC-TGI grids run from 1x1 to
+    30x30 inside the padded canvas. Pricing the weighted level with the unweighted radius is
+    anti-conservative by exactly sqrt(n / n_eff), so n_eff is returned here as well:
+
+      n_effective = (sum_i c_i)^2 / sum_i c_i^2 <= n,  with equality iff every c_i is equal.
+
+    Also returns n_examples, sum_cells and sum_cells_sq so n_eff can be recombined across shards,
+    plus cell_acc, active_cell_acc and exact_grid_acc.
+    """
     X, Y, T = panel
     model.eval()
     n = X.shape[0]
     ig = AUDIT_IGNORE_INDEX                      # pad token to exclude (content-only scoring)
     tot_loss = tot_cells = tot_correct = 0.0
+    tot_cells_sq = 0.0                           # sum_i c_i^2, for the effective sample size
+    ex_mean_sum = 0.0                            # sum_i m_i, for the unweighted per-example level
+    n_empty = 0                                  # examples with no content cell at all
     act_correct = act_total = 0.0
     exact = 0
     for i in range(0, n, batch_size):
@@ -340,11 +364,24 @@ def audit_panel_loss(model: nn.Module, panel: Tuple[np.ndarray, np.ndarray, np.n
         corr = (pred == yb) & valid
         tot_loss += float((nll * vf).sum().cpu()); tot_cells += float(vf.sum().cpu())
         tot_correct += float(corr.sum().cpu())
+        # Per-example bookkeeping: c_i (content cells) and m_i (that example's own mean).
+        c_i = vf.flatten(1).sum(1)                                      # (B,)
+        s_i = (nll * vf).flatten(1).sum(1)                              # (B,)
+        m_i = s_i / c_i.clamp_min(1.0)                                  # 0 for an all-pad example
+        tot_cells_sq += float((c_i * c_i).sum().cpu())
+        ex_mean_sum += float(m_i.sum().cpu())
+        n_empty += int((c_i == 0).sum().cpu())
         active = valid & (yb != 0)
         act_total += float(active.sum().cpu()); act_correct += float((corr & active).sum().cpu())
         exact += int(((corr | ~valid).flatten(1).all(1)).sum().cpu())   # exact over content cells
     return {
-        "floored_ce": tot_loss / max(tot_cells, 1.0),
+        "floored_ce": tot_loss / max(tot_cells, 1.0),                   # cell-weighted ratio
+        "floored_ce_per_example": ex_mean_sum / max(n, 1),              # unweighted over examples
+        "n_examples": int(n),
+        "n_examples_without_content_cells": int(n_empty),
+        "sum_cells": tot_cells,
+        "sum_cells_sq": tot_cells_sq,
+        "n_effective": (tot_cells * tot_cells / tot_cells_sq) if tot_cells_sq > 0 else 0.0,
         "cell_acc": tot_correct / max(tot_cells, 1.0),
         "active_cell_acc": act_correct / max(act_total, 1.0),
         "exact_grid_acc": exact / max(n, 1),
