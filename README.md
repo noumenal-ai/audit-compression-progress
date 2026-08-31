@@ -10,7 +10,7 @@ Signed compression progress measured on a fixed, sealed audit loss telescopes to
 - **`experiments/`**: the ARC-TGI experiment code (curriculum reward ablation, finite-audit concentration, the adaptive scalar-feedback holdout attack with its release defenses, and the boundary witnesses), plus `results_data/` for measured data that the code reads back.
 - **`notebooks/`**: [`audit_cp_report.ipynb`](notebooks/audit_cp_report.ipynb), which turns three vectors of
   per-audit-unit losses into the five reported numbers and the public report object.
-- **`examples/`**: the measurement applied to published results. [`examples/lambada-openai/`](examples/lambada-openai/) re-expresses GPT-2's LAMBADA table and a Pythia-160m training run in the five numbers, on one sealed panel.
+- **`examples/`**: the measurement applied to published results, indexed in [`examples/README.md`](examples/README.md). [`examples/lambada-openai/`](examples/lambada-openai/README.md) re-expresses GPT-2's LAMBADA table and a Pythia-160m training run in the five numbers, on one sealed panel.
 - **`dist/`**: downloadable snapshots, `AuditCP_lean.zip` (the Lean project) and `auditcp_experiments.zip` (code plus per-seed result shards).
 
 ## Lean: build and verify
@@ -110,6 +110,12 @@ python3 -m pip install numpy jupyter
 jupyter notebook notebooks/audit_cp_report.ipynb
 ```
 
+The notebook runs top to bottom with no arguments; its Section 9 asserts the ARC-TGI values against
+the archive and fails the run if they move. The worked example below does not reimplement any of
+this: `examples/lambada-openai/report.py` executes the notebook's Sections 1 to 8 and calls its
+`declare_panel`, `compute_slack`, `five_numbers`, `audit_cp_report` and `reconcile_increments`
+directly, so editing the notebook changes the example's numbers.
+
 ## Example: a published result in the five numbers
 
 [`examples/lambada-openai/`](examples/lambada-openai/README.md) applies the measurement to
@@ -126,10 +132,40 @@ two model sizes. Route (c), `delta = 0.05`, probability floor 0.01, one audit un
 | Pythia-160m step 1k to 143k, whole passage | +0.9433 | 0.684865 | **+0.2584** | 1.38 |
 
 The whole-passage GPT-2 comparison is reported as non-positive: no improvement is demonstrated at
-that panel's resolution. The example also records what the panel could have resolved before the run,
-what a token count instead of a passage count would have bought, how many transcript bits each bound
-absorbs under route (d), and a negative increment in Pythia's own released trajectory whose
-increments still reconcile to the endpoints exactly.
+that panel's resolution. The final-word GPT-2 bound is positive by 0.0436 nats at its own `N = 2`
+and turns negative at the `N = 12` union over every quote scored on the panel, so it sits on the
+boundary and its sign depends on an accounting choice that is declared rather than derived.
+
+**The published metrics were re-measured, not carried over.** Scoring the released checkpoints on
+the released evaluation file gives LAMBADA perplexity 40.06 for `gpt2` and 18.27 for `gpt2-medium`,
+against the paper's 35.13 and 15.60; the paper documents the invertible de-tokenizers and the
+stop-word filter that account for the gap, and releases neither. In log space the paper's gain is
+0.8118 nats and this reproduction's is 0.7853, while the two levels sit 0.131 and 0.158 nats off the
+paper's. Undisclosed preprocessing moves the level by about five times what it moves the difference,
+which is an argument for reporting the signed gain alongside the level.
+
+**What the measurement makes available.** A lower bound in nats whose slack contains `n`, `R`,
+`delta` and `N` and no term in the parameter count, the step count, the optimizer or the trajectory,
+so the same panel prices a 143,000-step adaptive run and a two-model size step identically. A
+resolution known before any gradient step: this panel demonstrates nothing smaller than 0.64 nats on
+the GPT-2 targets and 0.68 on the Pythia targets, and resolving 0.10 nats would take 208,661
+independent passages against the 5,153 it holds. And a dimensionless discrimination ratio, the one
+quantity here comparable across the two tokenizers, at 1.07 for the published size step against 5.09
+for the training run of a model with a third as many parameters. The example also prices what a
+token count instead of a passage count would have bought (it turns the negative whole-passage result
+positive), how many transcript bits each bound absorbs under route (d) (2.9 for the GPT-2 target,
+185.5 for Pythia), and a negative increment in Pythia's own released trajectory whose increments
+still reconcile to the endpoints exactly.
+
+`panel_declaration.json` fixes the panel, the unit, both loss functions, `alpha`, `delta`, the route
+and the six model states. It was hashed before any state was scored, and that hash is stamped into
+both files in `raw/` and into `report.json`, which `report.py` checks before it reads them.
+
+```sh
+cd examples/lambada-openai
+python3 report.py         # rebuilds report.json from the per-passage losses in raw/, no downloads
+python3 score_states.py   # re-scores the six pinned checkpoints, about 42 minutes on MPS
+```
 
 ## Citation
 
