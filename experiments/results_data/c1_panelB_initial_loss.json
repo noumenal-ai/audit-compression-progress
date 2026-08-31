@@ -1,0 +1,389 @@
+{
+  "measurement": "L_B(theta_0): audit level of the untrained model on the sealed panel B",
+  "experiment": "c1",
+  "policy": "audit_cp",
+  "scale": "full",
+  "loss": {
+    "name": "floored cross-entropy, content cells only (pad token excluded)",
+    "units": "nats",
+    "eps": 0.01,
+    "range_R": 4.605170185988091
+  },
+  "panel": {
+    "name": "B",
+    "construction": "panel(seed + 2000, audit_per_family=512, grid=30, LEARNABLE_TASKS)",
+    "sealed": true,
+    "scored_during_training": false,
+    "why_fixed_model": "Panel B is scored once, after the final training step. The per-step audit-CP reward reads the disjoint probe panel A (seed + 1000); C1 has no early stopping, no checkpoint selection, and no hyperparameter or data selection driven by a panel-B score. The panel produced no signal that influenced training, so the fixed-panel route applies with N = 1 and the reused-panel transcript-bit route is not needed."
+  },
+  "theta_0": "freshly initialised network, zero optimiser steps; run_c1 re-seeds torch immediately before make_model, so all seven C1 policies share theta_0 at a given seed",
+  "theta_T": "the audit_cp policy after 5000 steps; L_B(theta_T) is read back from results_data/c1_seed<S>.json -> c1.by_policy.audit_cp.final_fresh_floored_ce",
+  "fields": {
+    "L0": "L_B(theta_0), the initial audit level",
+    "LT": "L_B(theta_T), the terminal audit level",
+    "G": "signed gain L0 - LT",
+    "n_panel": "independent audit units in panel B (examples, not cells)"
+  },
+  "generated_by": "experiments/c1_panelB_initial_loss.py",
+  "per_seed": {
+    "0": {
+      "status": "ok",
+      "seed": 0,
+      "n_panel": 12288,
+      "L0": 2.461893686667638,
+      "LT": 1.7652978200273863,
+      "G": 0.6965958666402519,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "1": {
+      "status": "ok",
+      "seed": 1,
+      "n_panel": 12288,
+      "L0": 2.5175157678536824,
+      "LT": 1.714634228507974,
+      "G": 0.8028815393457083,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "2": {
+      "status": "ok",
+      "seed": 2,
+      "n_panel": 12288,
+      "L0": 2.484702918211606,
+      "LT": 1.8093524081562076,
+      "G": 0.6753505100553983,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "3": {
+      "status": "ok",
+      "seed": 3,
+      "n_panel": 12288,
+      "L0": 2.510848136261469,
+      "LT": 1.7483288052983927,
+      "G": 0.7625193309630762,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "4": {
+      "status": "ok",
+      "seed": 4,
+      "n_panel": 12288,
+      "L0": 2.5543575262964526,
+      "LT": 1.7717312835077643,
+      "G": 0.7826262427886883,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "5": {
+      "status": "ok",
+      "seed": 5,
+      "n_panel": 12288,
+      "L0": 2.4959119548639577,
+      "LT": 1.7801545081543788,
+      "G": 0.7157574467095789,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "6": {
+      "status": "ok",
+      "seed": 6,
+      "n_panel": 12288,
+      "L0": 2.4338738622289973,
+      "LT": 1.794404317891179,
+      "G": 0.6394695443378182,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "7": {
+      "status": "ok",
+      "seed": 7,
+      "n_panel": 12288,
+      "L0": 2.441626755262404,
+      "LT": 1.7132650255516655,
+      "G": 0.7283617297107385,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "8": {
+      "status": "ok",
+      "seed": 8,
+      "n_panel": 12288,
+      "L0": 2.5412615582907523,
+      "LT": 1.75712639803991,
+      "G": 0.7841351602508422,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "9": {
+      "status": "ok",
+      "seed": 9,
+      "n_panel": 12288,
+      "L0": 2.498317948806316,
+      "LT": 1.7573663900366385,
+      "G": 0.7409515587696773,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "10": {
+      "status": "ok",
+      "seed": 10,
+      "n_panel": 12288,
+      "L0": 2.4211813037549246,
+      "LT": 1.7527497851909626,
+      "G": 0.668431518563962,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "11": {
+      "status": "ok",
+      "seed": 11,
+      "n_panel": 12288,
+      "L0": 2.5113172193744764,
+      "LT": 1.755053553691157,
+      "G": 0.7562636656833195,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "12": {
+      "status": "ok",
+      "seed": 12,
+      "n_panel": 12288,
+      "L0": 2.4646669582133005,
+      "LT": 1.7451839693622893,
+      "G": 0.7194829888510113,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "13": {
+      "status": "ok",
+      "seed": 13,
+      "n_panel": 12288,
+      "L0": 2.461941834367185,
+      "LT": 1.752921977390446,
+      "G": 0.709019856976739,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "14": {
+      "status": "ok",
+      "seed": 14,
+      "n_panel": 12288,
+      "L0": 2.519522157591786,
+      "LT": 1.75273612380364,
+      "G": 0.766786033788146,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "15": {
+      "status": "ok",
+      "seed": 15,
+      "n_panel": 12288,
+      "L0": 2.441266376764277,
+      "LT": 1.6933885178057166,
+      "G": 0.7478778589585602,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "16": {
+      "status": "ok",
+      "seed": 16,
+      "n_panel": 12288,
+      "L0": 2.528223727394013,
+      "LT": 1.7173048822570864,
+      "G": 0.8109188451369267,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "17": {
+      "status": "ok",
+      "seed": 17,
+      "n_panel": 12288,
+      "L0": 2.5209841977196654,
+      "LT": 1.7286758997856841,
+      "G": 0.7923082979339813,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "18": {
+      "status": "ok",
+      "seed": 18,
+      "n_panel": 12288,
+      "L0": 2.4237488851902524,
+      "LT": 1.6988923436387244,
+      "G": 0.724856541551528,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    },
+    "19": {
+      "status": "ok",
+      "seed": 19,
+      "n_panel": 12288,
+      "L0": 2.449171556973001,
+      "LT": 1.7426679639541376,
+      "G": 0.7065035930188632,
+      "cfg": {
+        "grid": 30,
+        "audit_per_family": 512,
+        "steps": 5000,
+        "batch": 128,
+        "model": "cnn"
+      }
+    }
+  },
+  "aggregate": {
+    "n_seeds": 20,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "n_independent_audit_units": 12288,
+    "independent_unit": "example (one padded 30x30 ARC-TGI grid); NOT the cell",
+    "loss_range_R": 4.605170185988091,
+    "delta": 0.05,
+    "candidate_set_size_N": 1,
+    "slack_route": "c",
+    "Delta": 0.05642055019495678,
+    "slack_Gamma": 0.11284110038991356,
+    "L0": {
+      "mean": 2.4841167166043077,
+      "sd": 0.04105493623758308,
+      "min": 2.4211813037549246,
+      "max": 2.5543575262964526
+    },
+    "LT": {
+      "mean": 1.747561810102567,
+      "sd": 0.030057644977143232,
+      "min": 1.6933885178057166,
+      "max": 1.8093524081562076
+    },
+    "G": {
+      "mean": 0.7365549065017407,
+      "sd": 0.04676168344927034,
+      "min": 0.6394695443378182,
+      "max": 0.8109188451369267
+    },
+    "lower_bound_on_improvement": 0.6237138061118271,
+    "discrimination_ratio": 6.527363734992242,
+    "per_seed_lower_bound": {
+      "min": 0.5266284439479046,
+      "max": 0.6980777447470131,
+      "positive_count": 20,
+      "note": "each seed draws its own independent panel B, so this is the single-seed statement at delta=0.05 applied seed by seed; it is not a simultaneous 95% statement across all 20 seeds, which would need a union bound over seeds"
+    }
+  }
+}
