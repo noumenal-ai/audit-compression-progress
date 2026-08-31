@@ -8,6 +8,7 @@ Signed compression progress measured on a fixed, sealed audit loss telescopes to
 
 - **`AuditCP/`**: the machine-checked core (Lean 4 / Mathlib). Self-contained, with Mathlib as the only build dependency, pinned to an exact commit. Telescoping, the finite-audit `2*Delta_n` bound, finite Gibbs, and the conditional entropy floor are fully proved and axiom-audited. See [`AuditCP/README.md`](AuditCP/README.md).
 - **`experiments/`**: the ARC-TGI experiment code (curriculum reward ablation, finite-audit concentration, the adaptive scalar-feedback holdout attack with its release defenses, and the boundary witnesses), plus `results_data/` for measured data that the code reads back.
+- **`examples/`**: the measurement applied to published results. [`examples/lambada-openai/`](examples/lambada-openai/) re-expresses GPT-2's LAMBADA table and a Pythia-160m training run in the five numbers, on one sealed panel.
 - **`dist/`**: downloadable snapshots, `AuditCP_lean.zip` (the Lean project) and `auditcp_experiments.zip` (code plus per-seed result shards).
 
 ## Lean: build and verify
@@ -66,6 +67,27 @@ python3 c1_panelB_initial_loss.py --aggregate-only   # recompute the aggregate b
 ```
 
 The script rebuilds `theta_0` from the `run_c1` prefix, saves after every seed so an interrupted run resumes, and exits non-zero if the aggregate stops matching the values above. It reads `L_B(theta_T)` from `results_data/c1_seed<S>.json` when those shards have been unpacked, and otherwise straight out of `dist/auditcp_experiments.zip`.
+
+## Example: a published result in the five numbers
+
+[`examples/lambada-openai/`](examples/lambada-openai/README.md) applies the measurement to
+Radford et al. (2019), Table 3: LAMBADA perplexity falls from 35.13 to 15.60 and accuracy rises from
+45.99 to 55.48 percent between the 117M and 345M GPT-2 models. The same 5,153-passage panel also
+carries four released revisions of Pythia-160m, so one training run can be measured alongside the
+two model sizes. Route (c), `delta = 0.05`, probability floor 0.01, one audit unit per passage.
+
+| target | `G` | `Gamma` | `G - Gamma` | `G / Gamma` |
+|---|---|---|---|---|
+| GPT-2 124M to 355M, LAMBADA final word | +0.6799 | 0.636342 | **+0.0436** | 1.07 |
+| GPT-2 124M to 355M, whole passage | +0.2392 | 0.636342 | **-0.3971** | 0.38 |
+| Pythia-160m step 1k to 143k, final word | +3.4868 | 0.684865 | **+2.8019** | 5.09 |
+| Pythia-160m step 1k to 143k, whole passage | +0.9433 | 0.684865 | **+0.2584** | 1.38 |
+
+The whole-passage GPT-2 comparison is reported as non-positive: no improvement is demonstrated at
+that panel's resolution. The example also records what the panel could have resolved before the run,
+what a token count instead of a passage count would have bought, how many transcript bits each bound
+absorbs under route (d), and a negative increment in Pythia's own released trajectory whose
+increments still reconcile to the endpoints exactly.
 
 ## Citation
 

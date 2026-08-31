@@ -1,0 +1,733 @@
+{
+  "unit": "nats",
+  "vocabulary": {
+    "slack": "Gamma",
+    "headline": "lower bound on improvement = G - Gamma"
+  },
+  "panel": {
+    "panel_repo": "EleutherAI/lambada_openai",
+    "panel_revision": "900124bf3b8235c6daf21033af9948b3f07346c4",
+    "panel_file": "data/lambada_test_en.jsonl",
+    "panel_sha256": "4aa8d02cd17c719165fc8a7887fddd641f43fcafa4b1c806ca8abc31fabdb226",
+    "n_units": 5153
+  },
+  "declaration_sha256": "867eb86c76d2e69c3c1f9b1a0200f35c5f5e01a02b9985e649764c8b65f6caf1",
+  "environment": {
+    "torch": "2.8.0",
+    "device": "mps"
+  },
+  "states_scored": [
+    {
+      "state": "gpt2",
+      "repo": "gpt2",
+      "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+      "V": 50257,
+      "R": 15.430075305690172,
+      "alpha": 0.01,
+      "seconds": 72.8,
+      "mean_tgt_tokens_per_unit": 1.2755676305065011,
+      "mean_passage_tokens_per_unit": 82.49117019212109
+    },
+    {
+      "state": "gpt2-medium",
+      "repo": "gpt2-medium",
+      "revision": "6dcaa7a952f72f9298047fd5137cd6e4f05f41da",
+      "V": 50257,
+      "R": 15.430075305690172,
+      "alpha": 0.01,
+      "seconds": 1290.8,
+      "mean_tgt_tokens_per_unit": 1.2755676305065011,
+      "mean_passage_tokens_per_unit": 82.49117019212109
+    },
+    {
+      "state": "pythia-160m@1k",
+      "repo": "EleutherAI/pythia-160m",
+      "revision": "f711eaa4e5158955f6fcdff84a2145158b739f77",
+      "V": 50304,
+      "R": 15.43101006177697,
+      "alpha": 0.01,
+      "seconds": 310.7,
+      "mean_tgt_tokens_per_unit": 1.3689113137977877,
+      "mean_passage_tokens_per_unit": 80.242771201242
+    },
+    {
+      "state": "pythia-160m@16k",
+      "repo": "EleutherAI/pythia-160m",
+      "revision": "13af86250de4e88e9c788ba8d7fb5b0e8a4afb7a",
+      "V": 50304,
+      "R": 15.43101006177697,
+      "alpha": 0.01,
+      "seconds": 275.9,
+      "mean_tgt_tokens_per_unit": 1.3689113137977877,
+      "mean_passage_tokens_per_unit": 80.242771201242
+    },
+    {
+      "state": "pythia-160m@64k",
+      "repo": "EleutherAI/pythia-160m",
+      "revision": "aac0de458f9106a48f9e58f4ad7ba03f86753932",
+      "V": 50304,
+      "R": 15.43101006177697,
+      "alpha": 0.01,
+      "seconds": 268.6,
+      "mean_tgt_tokens_per_unit": 1.3689113137977877,
+      "mean_passage_tokens_per_unit": 80.242771201242
+    },
+    {
+      "state": "pythia-160m@143k",
+      "repo": "EleutherAI/pythia-160m",
+      "revision": "b56d9bee36300031aeea723b73c4d62ac7fa71a2",
+      "V": 50304,
+      "R": 15.43101006177697,
+      "alpha": 0.01,
+      "seconds": 325.8,
+      "mean_tgt_tokens_per_unit": 1.3689113137977877,
+      "mean_passage_tokens_per_unit": 80.242771201242
+    }
+  ],
+  "targets": [
+    {
+      "id": "Q1",
+      "label": "LAMBADA final word, GPT-2 BPE, mean floored token log loss per passage",
+      "family": "gpt2",
+      "metric": "loss_target",
+      "p_0": "gpt2",
+      "p_T": "gpt2-medium",
+      "N_candidate_states": 2,
+      "R": 15.430075305690172,
+      "V": 50257,
+      "n": 5153,
+      "delta": 0.05,
+      "radius_Delta": 0.3181709194868796,
+      "five_numbers": {
+        "terminal_level_B": 8.279975127684104,
+        "signed_gain_G": 0.6799265807576584,
+        "slack_Gamma": 0.6363418389737592,
+        "lower_bound_on_improvement": 0.04358474178389926,
+        "discrimination_ratio": 1.0684926545992783
+      },
+      "levels": {
+        "L_reference": 10.824905119702082,
+        "L_initial": 3.2248565727756366,
+        "L_terminal": 2.544929992017978
+      },
+      "positive": true,
+      "report_object": {
+        "unit": "nats",
+        "terminal_level": 8.279975,
+        "signed_gain": 0.679927,
+        "lower_bound_on_improvement": 0.043585,
+        "discrimination_ratio": 1.0685,
+        "target_version": "lambada-openai/gpt2/loss_target/alpha0.01/v1",
+        "reference_version": "uniform-over-50257-token-vocabulary/v1",
+        "masking_policy_version": "lambada-openai/final-word-only/v1",
+        "audit_unit": "one LAMBADA-OpenAI passage; loss is the mean over the scored tokens of that passage of -ln((1-0.01)p + 0.01/50257)",
+        "n_independent_units": 5153,
+        "slack": 0.636342,
+        "slack_route": "c",
+        "slack_route_label": "fixed panel, declared candidate set",
+        "slack_parameters": {
+          "n": 5153,
+          "R": 15.430075305690172,
+          "delta": 0.05,
+          "N": 2.0,
+          "Delta": 0.3181709194868796,
+          "panel": "LAMBADA-OpenAI test, scored under the GPT-2 release"
+        },
+        "transcript_bits": null,
+        "commitment_record": {
+          "state_commitment": "hf revisions 607a30d783dfa663caf39e06633721c8d4cfcd7e -> 6dcaa7a952f72f9298047fd5137cd6e4f05f41da",
+          "committed_at": "published model revisions, pinned by commit sha before scoring",
+          "challenge_drawn_after_commitment": true,
+          "panel_declaration_sha256": "867eb86c76d2e69c3c1f9b1a0200f35c5f5e01a02b9985e649764c8b65f6caf1",
+          "panel_file_sha256": "4aa8d02cd17c719165fc8a7887fddd641f43fcafa4b1c806ca8abc31fabdb226",
+          "note": "the two states are immutable published revisions and the panel is an immutable published file; both hashes predate this report"
+        },
+        "levels": {
+          "L_reference": 10.824905,
+          "L_initial": 3.224857,
+          "L_terminal": 2.54493
+        },
+        "evidence_digest": "sha256:53fc31c339238146378b5467e583df95816fc7324c4bac45e8ec3923162c8546",
+        "notes": [
+          "route (c) with N = 2, the number of model states scored on this target's panel",
+          "panel: EleutherAI/lambada_openai @ 900124bf3b, data/lambada_test_en.jsonl"
+        ]
+      },
+      "diagnostics_not_part_of_the_bound": {
+        "empirical_paired_sd_of_per_unit_gain": 1.2681506861684753,
+        "normal_approximation_paired_halfwidth_95pct": 0.03462492841856583,
+        "worst_case_slack_over_normal_halfwidth": 18.378141646425867,
+        "note": "the normal-approximation half-width is reported only to show how much the worst-case route (c) slack costs; it is not a worst-case bound and no claim rests on it"
+      },
+      "route_d_sensitivity": {
+        "question": "how many bits of audit-derived transcript could have reached training before the bound is erased",
+        "max_transcript_bits_keeping_bound_positive": 2.8956689803714823
+      },
+      "resolution": {
+        "smallest_improvement_this_panel_can_demonstrate_nats": 0.6363418389737592,
+        "n_needed_for_0.10_nats": 208661,
+        "n_needed_for_0.25_nats": 33386,
+        "n_needed_for_half_the_observed_gain": 18055
+      },
+      "per_state_levels": {
+        "gpt2": 3.2248565727756366,
+        "gpt2-medium": 2.544929992017978
+      }
+    },
+    {
+      "id": "Q2",
+      "label": "LAMBADA whole passage, GPT-2 BPE, mean floored token log loss per passage",
+      "family": "gpt2",
+      "metric": "loss_passage",
+      "p_0": "gpt2",
+      "p_T": "gpt2-medium",
+      "N_candidate_states": 2,
+      "R": 15.430075305690172,
+      "V": 50257,
+      "n": 5153,
+      "delta": 0.05,
+      "radius_Delta": 0.3181709194868796,
+      "five_numbers": {
+        "terminal_level_B": 7.466211969356976,
+        "signed_gain_G": 0.2392275054098283,
+        "slack_Gamma": 0.6363418389737592,
+        "lower_bound_on_improvement": -0.3971143335639309,
+        "discrimination_ratio": 0.37594181422305206
+      },
+      "levels": {
+        "L_reference": 10.824905119702082,
+        "L_initial": 3.597920655754934,
+        "L_terminal": 3.358693150345106
+      },
+      "positive": false,
+      "report_object": {
+        "unit": "nats",
+        "terminal_level": 7.466212,
+        "signed_gain": 0.239228,
+        "lower_bound_on_improvement": -0.397114,
+        "discrimination_ratio": 0.3759,
+        "target_version": "lambada-openai/gpt2/loss_passage/alpha0.01/v1",
+        "reference_version": "uniform-over-50257-token-vocabulary/v1",
+        "masking_policy_version": "lambada-openai/passage-positions-1..T-1/v1",
+        "audit_unit": "one LAMBADA-OpenAI passage; loss is the mean over the scored tokens of that passage of -ln((1-0.01)p + 0.01/50257)",
+        "n_independent_units": 5153,
+        "slack": 0.636342,
+        "slack_route": "c",
+        "slack_route_label": "fixed panel, declared candidate set",
+        "slack_parameters": {
+          "n": 5153,
+          "R": 15.430075305690172,
+          "delta": 0.05,
+          "N": 2.0,
+          "Delta": 0.3181709194868796,
+          "panel": "LAMBADA-OpenAI test, scored under the GPT-2 release"
+        },
+        "transcript_bits": null,
+        "commitment_record": {
+          "state_commitment": "hf revisions 607a30d783dfa663caf39e06633721c8d4cfcd7e -> 6dcaa7a952f72f9298047fd5137cd6e4f05f41da",
+          "committed_at": "published model revisions, pinned by commit sha before scoring",
+          "challenge_drawn_after_commitment": true,
+          "panel_declaration_sha256": "867eb86c76d2e69c3c1f9b1a0200f35c5f5e01a02b9985e649764c8b65f6caf1",
+          "panel_file_sha256": "4aa8d02cd17c719165fc8a7887fddd641f43fcafa4b1c806ca8abc31fabdb226",
+          "note": "the two states are immutable published revisions and the panel is an immutable published file; both hashes predate this report"
+        },
+        "levels": {
+          "L_reference": 10.824905,
+          "L_initial": 3.597921,
+          "L_terminal": 3.358693
+        },
+        "evidence_digest": "sha256:1ef804bd69fb26a5592da54c4f6512b55ff497cac3e77cf315e7489c1e2d250b",
+        "notes": [
+          "route (c) with N = 2, the number of model states scored on this target's panel",
+          "panel: EleutherAI/lambada_openai @ 900124bf3b, data/lambada_test_en.jsonl"
+        ]
+      },
+      "diagnostics_not_part_of_the_bound": {
+        "empirical_paired_sd_of_per_unit_gain": 0.1150619756933948,
+        "normal_approximation_paired_halfwidth_95pct": 0.003141592490179259,
+        "worst_case_slack_over_normal_halfwidth": 202.5539088736011,
+        "note": "the normal-approximation half-width is reported only to show how much the worst-case route (c) slack costs; it is not a worst-case bound and no claim rests on it"
+      },
+      "route_d_sensitivity": {
+        "question": "how many bits of audit-derived transcript could have reached training before the bound is erased",
+        "max_transcript_bits_keeping_bound_positive": -3.428435787557247
+      },
+      "resolution": {
+        "smallest_improvement_this_panel_can_demonstrate_nats": 0.6363418389737592,
+        "n_needed_for_0.10_nats": 208661,
+        "n_needed_for_0.25_nats": 33386,
+        "n_needed_for_half_the_observed_gain": 145841
+      },
+      "per_state_levels": {
+        "gpt2": 3.597920655754934,
+        "gpt2-medium": 3.358693150345106
+      }
+    },
+    {
+      "id": "Q3",
+      "label": "LAMBADA final word, NeoX BPE, mean floored token log loss per passage",
+      "family": "pythia",
+      "metric": "loss_target",
+      "p_0": "pythia-160m@1k",
+      "p_T": "pythia-160m@143k",
+      "N_candidate_states": 4,
+      "R": 15.43101006177697,
+      "V": 50304,
+      "n": 5153,
+      "delta": 0.05,
+      "radius_Delta": 0.34243231800172963,
+      "five_numbers": {
+        "terminal_level_B": 7.791508535182203,
+        "signed_gain_G": 3.4868076061006494,
+        "slack_Gamma": 0.6848646360034593,
+        "lower_bound_on_improvement": 2.80194297009719,
+        "discrimination_ratio": 5.091236169599853
+      },
+      "levels": {
+        "L_reference": 10.825839875788876,
+        "L_initial": 6.521138946707323,
+        "L_terminal": 3.0343313406066734
+      },
+      "positive": true,
+      "report_object": {
+        "unit": "nats",
+        "terminal_level": 7.791509,
+        "signed_gain": 3.486808,
+        "lower_bound_on_improvement": 2.801943,
+        "discrimination_ratio": 5.0912,
+        "target_version": "lambada-openai/pythia/loss_target/alpha0.01/v1",
+        "reference_version": "uniform-over-50304-token-vocabulary/v1",
+        "masking_policy_version": "lambada-openai/final-word-only/v1",
+        "audit_unit": "one LAMBADA-OpenAI passage; loss is the mean over the scored tokens of that passage of -ln((1-0.01)p + 0.01/50304)",
+        "n_independent_units": 5153,
+        "slack": 0.684865,
+        "slack_route": "c",
+        "slack_route_label": "fixed panel, declared candidate set",
+        "slack_parameters": {
+          "n": 5153,
+          "R": 15.43101006177697,
+          "delta": 0.05,
+          "N": 4.0,
+          "Delta": 0.34243231800172963,
+          "panel": "LAMBADA-OpenAI test, scored under the Pythia-160m released revisions"
+        },
+        "transcript_bits": null,
+        "commitment_record": {
+          "state_commitment": "hf revisions f711eaa4e5158955f6fcdff84a2145158b739f77 -> b56d9bee36300031aeea723b73c4d62ac7fa71a2",
+          "committed_at": "published model revisions, pinned by commit sha before scoring",
+          "challenge_drawn_after_commitment": true,
+          "panel_declaration_sha256": "867eb86c76d2e69c3c1f9b1a0200f35c5f5e01a02b9985e649764c8b65f6caf1",
+          "panel_file_sha256": "4aa8d02cd17c719165fc8a7887fddd641f43fcafa4b1c806ca8abc31fabdb226",
+          "note": "the two states are immutable published revisions and the panel is an immutable published file; both hashes predate this report"
+        },
+        "levels": {
+          "L_reference": 10.82584,
+          "L_initial": 6.521139,
+          "L_terminal": 3.034331
+        },
+        "evidence_digest": "sha256:394155c4c7e1a1d55d2b702e3634536df06b623d3724c30bdccb1921de380ca0",
+        "notes": [
+          "route (c) with N = 4, the number of model states scored on this target's panel",
+          "panel: EleutherAI/lambada_openai @ 900124bf3b, data/lambada_test_en.jsonl"
+        ]
+      },
+      "diagnostics_not_part_of_the_bound": {
+        "empirical_paired_sd_of_per_unit_gain": 2.4562639918122477,
+        "normal_approximation_paired_halfwidth_95pct": 0.06706455772267833,
+        "worst_case_slack_over_normal_halfwidth": 10.212020465943782,
+        "note": "the normal-approximation half-width is reported only to show how much the worst-case route (c) slack costs; it is not a worst-case bound and no claim rests on it"
+      },
+      "route_d_sensitivity": {
+        "question": "how many bits of audit-derived transcript could have reached training before the bound is erased",
+        "max_transcript_bits_keeping_bound_positive": 185.4674690243324
+      },
+      "resolution": {
+        "smallest_improvement_this_panel_can_demonstrate_nats": 0.6848646360034593,
+        "n_needed_for_0.10_nats": 241697,
+        "n_needed_for_0.25_nats": 38672,
+        "n_needed_for_half_the_observed_gain": 796
+      },
+      "per_state_levels": {
+        "pythia-160m@1k": 6.521138946707323,
+        "pythia-160m@16k": 3.04605444979134,
+        "pythia-160m@64k": 2.797773780526712,
+        "pythia-160m@143k": 3.0343313406066734
+      }
+    },
+    {
+      "id": "Q4",
+      "label": "LAMBADA whole passage, NeoX BPE, mean floored token log loss per passage",
+      "family": "pythia",
+      "metric": "loss_passage",
+      "p_0": "pythia-160m@1k",
+      "p_T": "pythia-160m@143k",
+      "N_candidate_states": 4,
+      "R": 15.43101006177697,
+      "V": 50304,
+      "n": 5153,
+      "delta": 0.05,
+      "radius_Delta": 0.34243231800172963,
+      "five_numbers": {
+        "terminal_level_B": 7.429102438985422,
+        "signed_gain_G": 0.9432630633693133,
+        "slack_Gamma": 0.6848646360034593,
+        "lower_bound_on_improvement": 0.25839842736585406,
+        "discrimination_ratio": 1.3772985401520264
+      },
+      "levels": {
+        "L_reference": 10.825839875788876,
+        "L_initial": 4.340000500172768,
+        "L_terminal": 3.3967374368034546
+      },
+      "positive": true,
+      "report_object": {
+        "unit": "nats",
+        "terminal_level": 7.429102,
+        "signed_gain": 0.943263,
+        "lower_bound_on_improvement": 0.258398,
+        "discrimination_ratio": 1.3773,
+        "target_version": "lambada-openai/pythia/loss_passage/alpha0.01/v1",
+        "reference_version": "uniform-over-50304-token-vocabulary/v1",
+        "masking_policy_version": "lambada-openai/passage-positions-1..T-1/v1",
+        "audit_unit": "one LAMBADA-OpenAI passage; loss is the mean over the scored tokens of that passage of -ln((1-0.01)p + 0.01/50304)",
+        "n_independent_units": 5153,
+        "slack": 0.684865,
+        "slack_route": "c",
+        "slack_route_label": "fixed panel, declared candidate set",
+        "slack_parameters": {
+          "n": 5153,
+          "R": 15.43101006177697,
+          "delta": 0.05,
+          "N": 4.0,
+          "Delta": 0.34243231800172963,
+          "panel": "LAMBADA-OpenAI test, scored under the Pythia-160m released revisions"
+        },
+        "transcript_bits": null,
+        "commitment_record": {
+          "state_commitment": "hf revisions f711eaa4e5158955f6fcdff84a2145158b739f77 -> b56d9bee36300031aeea723b73c4d62ac7fa71a2",
+          "committed_at": "published model revisions, pinned by commit sha before scoring",
+          "challenge_drawn_after_commitment": true,
+          "panel_declaration_sha256": "867eb86c76d2e69c3c1f9b1a0200f35c5f5e01a02b9985e649764c8b65f6caf1",
+          "panel_file_sha256": "4aa8d02cd17c719165fc8a7887fddd641f43fcafa4b1c806ca8abc31fabdb226",
+          "note": "the two states are immutable published revisions and the panel is an immutable published file; both hashes predate this report"
+        },
+        "levels": {
+          "L_reference": 10.82584,
+          "L_initial": 4.340001,
+          "L_terminal": 3.396737
+        },
+        "evidence_digest": "sha256:93b16d94d92cc2fd0784a566564af11a5394ef64561708f4c96095b09c2265df",
+        "notes": [
+          "route (c) with N = 4, the number of model states scored on this target's panel",
+          "panel: EleutherAI/lambada_openai @ 900124bf3b, data/lambada_test_en.jsonl"
+        ]
+      },
+      "diagnostics_not_part_of_the_bound": {
+        "empirical_paired_sd_of_per_unit_gain": 0.20422813372371307,
+        "normal_approximation_paired_halfwidth_95pct": 0.005576139009636126,
+        "worst_case_slack_over_normal_halfwidth": 122.82058155651153,
+        "note": "the normal-approximation half-width is reported only to show how much the worst-case route (c) slack costs; it is not a worst-case bound and no claim rests on it"
+      },
+      "route_d_sensitivity": {
+        "question": "how many bits of audit-derived transcript could have reached training before the bound is erased",
+        "max_transcript_bits_keeping_bound_positive": 9.567412694075294
+      },
+      "resolution": {
+        "smallest_improvement_this_panel_can_demonstrate_nats": 0.6848646360034593,
+        "n_needed_for_0.10_nats": 241697,
+        "n_needed_for_0.25_nats": 38672,
+        "n_needed_for_half_the_observed_gain": 10866
+      },
+      "per_state_levels": {
+        "pythia-160m@1k": 4.340000500172768,
+        "pythia-160m@16k": 3.4413654485553007,
+        "pythia-160m@64k": 3.372470377358977,
+        "pythia-160m@143k": 3.3967374368034546
+      }
+    }
+  ],
+  "union_sensitivity": {
+    "N_union": 12,
+    "reason": "total number of (model state, target) quotes scored on this one panel",
+    "per_target": [
+      {
+        "id": "Q1",
+        "slack_Gamma_union": 0.7553161341558556,
+        "lower_bound_union": -0.0753895533981972,
+        "positive_under_union": false,
+        "flips_to_non_positive": true
+      },
+      {
+        "id": "Q2",
+        "slack_Gamma_union": 0.7553161341558556,
+        "lower_bound_union": -0.5160886287460273,
+        "positive_under_union": false,
+        "flips_to_non_positive": false
+      },
+      {
+        "id": "Q3",
+        "slack_Gamma_union": 0.7553618913112726,
+        "lower_bound_union": 2.731445714789377,
+        "positive_under_union": true,
+        "flips_to_non_positive": false
+      },
+      {
+        "id": "Q4",
+        "slack_Gamma_union": 0.7553618913112726,
+        "lower_bound_union": 0.1879011720580407,
+        "positive_under_union": true,
+        "flips_to_non_positive": false
+      }
+    ]
+  },
+  "anti_conservative_unit_demo": [
+    {
+      "id": "Q1",
+      "n_correct_units": 5153,
+      "n_tokens_wrong": 6573,
+      "sub_units_per_record": 1.2755676305065011,
+      "slack_if_tokens_used": 0.5634283995695338,
+      "lower_bound_if_tokens_used": 0.1164981811881246,
+      "correct_lower_bound": 0.04358474178389926,
+      "would_flip_a_negative_to_positive": false
+    },
+    {
+      "id": "Q2",
+      "n_correct_units": 5153,
+      "n_tokens_wrong": 425077,
+      "sub_units_per_record": 82.49117019212109,
+      "slack_if_tokens_used": 0.07006268012808818,
+      "lower_bound_if_tokens_used": 0.1691648252817401,
+      "correct_lower_bound": -0.3971143335639309,
+      "would_flip_a_negative_to_positive": true
+    },
+    {
+      "id": "Q3",
+      "n_correct_units": 5153,
+      "n_tokens_wrong": 7054,
+      "sub_units_per_record": 1.3689113137977877,
+      "slack_if_tokens_used": 0.5853519708188859,
+      "lower_bound_if_tokens_used": 2.9014556352817635,
+      "correct_lower_bound": 2.80194297009719,
+      "would_flip_a_negative_to_positive": false
+    },
+    {
+      "id": "Q4",
+      "n_correct_units": 5153,
+      "n_tokens_wrong": 413491,
+      "sub_units_per_record": 80.242771201242,
+      "slack_if_tokens_used": 0.07645427634681577,
+      "lower_bound_if_tokens_used": 0.8668087870224975,
+      "correct_lower_bound": 0.25839842736585406,
+      "would_flip_a_negative_to_positive": false
+    }
+  ],
+  "published_claim": {
+    "paper": "Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever. Language Models are Unsupervised Multitask Learners. OpenAI technical report, 2019.",
+    "table": "Table 3, zero-shot results. Caption: no training or fine-tuning was performed for any of these results.",
+    "rows": {
+      "117M": {
+        "lambada_ppl": 35.13,
+        "lambada_acc_percent": 45.99
+      },
+      "345M": {
+        "lambada_ppl": 15.6,
+        "lambada_acc_percent": 55.48
+      },
+      "762M": {
+        "lambada_ppl": 10.87,
+        "lambada_acc_percent": 60.12
+      },
+      "1542M": {
+        "lambada_ppl": 8.63,
+        "lambada_acc_percent": 63.24
+      }
+    },
+    "reported_uncertainty": "none; Table 3 carries no interval, no seed spread and no resolution statement",
+    "known_preprocessing_gaps": [
+      "Section 3.1 reports the use of invertible de-tokenizers worth 2.5 to 5 perplexity points, which are not part of the released lambada_test.jsonl panel",
+      "Section 3.3 states that the LAMBADA accuracy column adds a stop-word filter, which raises the 1542M accuracy from 52.66 to 63.24 percent; the filter is not released"
+    ],
+    "pythia_paper": "Stella Biderman et al. Pythia: A Suite for Analyzing Large Language Models Across Training and Scaling. ICML 2023, arXiv:2304.01373. 154 checkpoints per model at fixed step intervals, identical data order across models."
+  },
+  "revision_ladders": {
+    "Q4": {
+      "metric": "loss_passage",
+      "states": [
+        "pythia-160m@1k",
+        "pythia-160m@16k",
+        "pythia-160m@64k",
+        "pythia-160m@143k"
+      ],
+      "levels": [
+        4.340000500172768,
+        3.4413654485553007,
+        3.372470377358977,
+        3.3967374368034546
+      ],
+      "audit_levels_B": [
+        6.48583937561611,
+        7.384474427233577,
+        7.453369498429901,
+        7.429102438985423
+      ],
+      "increments": [
+        0.8986350516174673,
+        0.06889507119632388,
+        -0.024267059444477823
+      ],
+      "legs": [
+        {
+          "from": "pythia-160m@1k",
+          "to": "pythia-160m@16k",
+          "increment": 0.8986350516174673,
+          "sign": "gain",
+          "exceeds_slack": true
+        },
+        {
+          "from": "pythia-160m@16k",
+          "to": "pythia-160m@64k",
+          "increment": 0.06889507119632388,
+          "sign": "gain",
+          "exceeds_slack": false
+        },
+        {
+          "from": "pythia-160m@64k",
+          "to": "pythia-160m@143k",
+          "increment": -0.024267059444477823,
+          "sign": "regression",
+          "exceeds_slack": false
+        }
+      ],
+      "reconciliation": {
+        "steps": 3,
+        "sum_of_increments": 0.9432630633693133,
+        "endpoint_difference": 0.9432630633693133,
+        "residual": 0.0,
+        "reconciles": true,
+        "negative_increments": 1
+      },
+      "negative_increments": 1
+    },
+    "Q3": {
+      "metric": "loss_target",
+      "states": [
+        "pythia-160m@1k",
+        "pythia-160m@16k",
+        "pythia-160m@64k",
+        "pythia-160m@143k"
+      ],
+      "levels": [
+        6.521138946707323,
+        3.04605444979134,
+        2.797773780526712,
+        3.0343313406066734
+      ],
+      "audit_levels_B": [
+        4.304700929081555,
+        7.779785425997538,
+        8.028066095262165,
+        7.791508535182205
+      ],
+      "increments": [
+        3.475084496915983,
+        0.2482806692646271,
+        -0.23655756007996054
+      ],
+      "legs": [
+        {
+          "from": "pythia-160m@1k",
+          "to": "pythia-160m@16k",
+          "increment": 3.475084496915983,
+          "sign": "gain",
+          "exceeds_slack": true
+        },
+        {
+          "from": "pythia-160m@16k",
+          "to": "pythia-160m@64k",
+          "increment": 0.2482806692646271,
+          "sign": "gain",
+          "exceeds_slack": false
+        },
+        {
+          "from": "pythia-160m@64k",
+          "to": "pythia-160m@143k",
+          "increment": -0.23655756007996054,
+          "sign": "regression",
+          "exceeds_slack": false
+        }
+      ],
+      "reconciliation": {
+        "steps": 3,
+        "sum_of_increments": 3.4868076061006494,
+        "endpoint_difference": 3.4868076061006494,
+        "residual": 0.0,
+        "reconciles": true,
+        "negative_increments": 1
+      },
+      "negative_increments": 1
+    }
+  },
+  "published_metric_reproduction": {
+    "gpt2": {
+      "lambada_perplexity_per_word": 40.05541455173235,
+      "lambada_accuracy": 0.32563555210556955,
+      "mean_target_word_nll_nats": 3.690263859176184
+    },
+    "gpt2-medium": {
+      "lambada_perplexity_per_word": 18.264825311579916,
+      "lambada_accuracy": 0.4298466912478168,
+      "mean_target_word_nll_nats": 2.904977096094196
+    },
+    "pythia-160m@143k": {
+      "lambada_perplexity_per_word": 37.25509584394277,
+      "lambada_accuracy": 0.3537745002910926,
+      "mean_target_word_nll_nats": 3.617788736648812
+    },
+    "pythia-160m@16k": {
+      "lambada_perplexity_per_word": 37.929599300021685,
+      "lambada_accuracy": 0.3415486124587619,
+      "mean_target_word_nll_nats": 3.6357317914483724
+    },
+    "pythia-160m@1k": {
+      "lambada_perplexity_per_word": 2591.688909378333,
+      "lambada_accuracy": 0.06481661168251504,
+      "mean_target_word_nll_nats": 7.860065030739281
+    },
+    "pythia-160m@64k": {
+      "lambada_perplexity_per_word": 28.069222337339678,
+      "lambada_accuracy": 0.37065786920240634,
+      "mean_target_word_nll_nats": 3.3346736855845904
+    }
+  },
+  "accuracy_comparisons": [
+    {
+      "comparison": "GPT-2 124M -> GPT-2 355M",
+      "accuracy_initial": 0.32563555210556955,
+      "accuracy_terminal": 0.4298466912478168,
+      "accuracy_delta": 0.10421113914224724,
+      "worst_case_paired_radius_at_delta_0.05": 0.03783834723771774,
+      "delta_exceeds_its_worst_case_paired_radius": true,
+      "discordant_pairs_up": 801,
+      "discordant_pairs_down": 264,
+      "diagnostics_not_part_of_the_bound": {
+        "empirical_paired_sd": 0.44255369061415134,
+        "normal_approximation_halfwidth_95pct": 0.012083256371673318
+      }
+    },
+    {
+      "comparison": "Pythia-160m step 1k -> step 143k",
+      "accuracy_initial": 0.06481661168251504,
+      "accuracy_terminal": 0.3537745002910926,
+      "accuracy_delta": 0.2889578886085775,
+      "worst_case_paired_radius_at_delta_0.05": 0.03783834723771774,
+      "delta_exceeds_its_worst_case_paired_radius": true,
+      "discordant_pairs_up": 1540,
+      "discordant_pairs_down": 51,
+      "diagnostics_not_part_of_the_bound": {
+        "empirical_paired_sd": 0.4746569748376198,
+        "normal_approximation_halfwidth_95pct": 0.01295978778892699
+      }
+    }
+  ]
+}
