@@ -1,13 +1,12 @@
-/-
-Audit-CP: a self-contained (Mathlib-only) formal core for
-"signed compression progress on a sealed audit panel is Goodhart-resistant."
+import AuditCP.Paper
 
-Dependency policy: Mathlib is the SOLE `require`. The finite-PMF / cross-entropy layer is
-VENDORED (copied, cited) from the author's prior Lean development in AuditCP/Vendored/FinitePMF.lean, not `require`d.
+/-!
+# AuditCP — current-paper root
+
+This root deliberately exposes only the finite sealed-audit development used by the current
+Audit-CP paper.  The random-set, cybernetic-quotient, amalgamation, and model-theoretic
+rederivation has the separate root `AuditCPNext`.
+
+Dependency direction is one way: `AuditCPNext` may import this root; this root must never import
+`AuditCP.Next` or any of its modules.
 -/
-import AuditCP.Vendored.FinitePMF
-import AuditCP.Basic
-import AuditCP.Telescope
-import AuditCP.FiniteAudit
-import AuditCP.EntropyFloor
-import AuditCP.FiniteExperts

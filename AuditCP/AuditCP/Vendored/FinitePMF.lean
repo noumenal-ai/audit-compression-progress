@@ -7,6 +7,9 @@ No edit was necessary: the original import block is already pure `Mathlib.*`
 Declarations copied: FinitePMF, klDivFinitePMF, crossEntropyFinitePMF, expectFinitePMF, HasPositivePrior.
 NOTE: the source file contains NO Gibbs / nonnegativity / klDivFinitePMF_nonneg lemma; such a lemma
 must be proved from Mathlib; it is proved in EntropyFloor.lean (klDivFinitePMF_nonneg).
+
+This file sits beneath `AuditCP/Base.lean`, which imports it: every declaration here is the
+simplex-constrained refinement of base type `AuditPotential`, or a functional of one.
 -/
 /-
 Copyright (c) 2026 Dhruv Gupta. All rights reserved.
@@ -37,33 +40,33 @@ KL divergence, cross-entropy, and expected values. No learning-theory types.
 
 open Finset
 
-/-- A probability mass function over a finite type.
-    Named FinitePMF to avoid conflict with Mathlib's PMF. -/
+/-- A finite-support probability mass function on `H`: a function `prob : H → ℝ` that is
+nonnegative at every point and sums to `1` over `H`. -/
 structure FinitePMF (H : Type*) [Fintype H] where
   prob : H → ℝ
   prob_nonneg : ∀ h, 0 ≤ prob h
   prob_sum_one : ∑ h : H, prob h = 1
 
-/-- KL divergence between two FinitePMFs over a finite type.
-    KL(Q‖P) = ∑_h Q(h) · log(Q(h)/P(h)).
-    Convention: 0 · log(0/p) = 0. -/
+/-- The Kullback–Leibler divergence of `Q` from `P` on a finite type `H`,
+∑ₕ Q(h) · log(Q(h) / P(h)), with each term taken to be `0` where `Q(h) = 0` (kullback1951). -/
 noncomputable def klDivFinitePMF {H : Type*} [Fintype H]
     (Q P : FinitePMF H) : ℝ :=
   ∑ h : H, if Q.prob h = 0 then 0
     else Q.prob h * Real.log (Q.prob h / P.prob h)
 
-/-- Cross-entropy: ∑_h Q(h) · log(1/P(h)).
-    Equals KL(Q‖P) + H(Q) where H(Q) is Shannon entropy. -/
+/-- The cross-entropy of `Q` relative to `P` on a finite type `H`, ∑ₕ Q(h) · log(1 / P(h)),
+with each term taken to be `0` where `Q(h) = 0`. -/
 noncomputable def crossEntropyFinitePMF {H : Type*} [Fintype H]
     (Q P : FinitePMF H) : ℝ :=
   ∑ h : H, if Q.prob h = 0 then 0
     else Q.prob h * Real.log (1 / P.prob h)
 
-/-- Expected value of a real-valued function under a FinitePMF. -/
+/-- The expectation of `f` under the finite probability mass function `Q`, ∑ₕ Q(h) · f(h). -/
 noncomputable def expectFinitePMF {H : Type*} [Fintype H]
     (Q : FinitePMF H) (f : H → ℝ) : ℝ :=
   ∑ h : H, Q.prob h * f h
 
-/-- Typeclass asserting that a FinitePMF has strictly positive weights. -/
+/-- The typeclass asserting that the finite probability mass function `P` has strictly positive
+weight at every point of `H`. -/
 class HasPositivePrior {H : Type*} [Fintype H] (P : FinitePMF H) : Prop where
   pos : ∀ h, 0 < P.prob h

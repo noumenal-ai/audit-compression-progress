@@ -7,3 +7,4 @@ __pycache__/
 *.fdb_latexmk
 .env
 .venv/
+.lake/

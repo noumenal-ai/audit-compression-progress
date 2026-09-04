@@ -1,21 +1,31 @@
-import AuditCP.Telescope
+import AuditCP.FiniteBlackwellBrier
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 
 /-!
-# T3 — noisy-TV entropy floor, finite Gibbs, and the cross-entropy composition
+# Chapter 11 — what the ledger cannot buy
+
+The slack of Chapter 3 bounds the gap between a measured and a population reading (schmidhuber2010).  It says nothing
+about how much true progress there is to have.  This chapter says that, and the answer is a
+pre-training constant: the total signed progress available on a B2 potential along any B3
+trajectory is the initial excess over a floor, and for a cross-entropy potential the floor is the
+data's own entropy.  Reducible ignorance pays; noise does not.
+
+The concrete instance refines B2 exactly as `AuditCP.Base` describes it: `FinitePMF` is the
+simplex-constrained refinement of a real reading, and `fun θ => condCrossEntropyFinitePMF μ Q (P θ)`
+is the resulting `AuditPotential ι` that `cumCP` reads.
 
 `klDivFinitePMF_nonneg` (Gibbs) is assembled from Mathlib `Real.log_le_sub_one_of_pos`.
-`entropy_floor_budget` is the abstract budget that takes the floor as a hypothesis (reducing to
-`cumCP_le_of_lb`). The cross-entropy case is then mechanized end to end:
-`crossEntropyFinitePMF_eq_entropy_add_kl` (H(Q,P)=H(Q)+KL) composed with `klDivFinitePMF_nonneg`
-gives the derived floor `entropy_le_crossEntropyFinitePMF` (H(Q) <= H(Q,P)), which
-`entropy_floor_budget_crossEntropy` discharges into the trajectory budget: the floor is derived,
-not assumed.
+`entropy_floor_budget` is the abstract budget that takes the floor as a hypothesis, reducing to
+`cumCP_le_of_lb`.  The cross-entropy case is then mechanized end to end:
+`crossEntropyFinitePMF_eq_entropy_add_kl` (`H(Q,P) = H(Q) + KL`) composed with
+`klDivFinitePMF_nonneg` gives the derived floor `entropy_le_crossEntropyFinitePMF`
+(`H(Q) ≤ H(Q,P)`), which `entropy_floor_budget_crossEntropy` discharges into the trajectory budget:
+the floor is derived, not assumed.
 -/
 
 namespace AuditCP
 
-/-- **Finite Gibbs.** KL divergence between finite pmfs is nonnegative (positive prior). -/
+/-- Given a positive-prior `P`, `0 ≤ klDivFinitePMF Q P`. -/
 theorem klDivFinitePMF_nonneg {H : Type*} [Fintype H] (Q P : FinitePMF H)
     [HasPositivePrior P] : 0 ≤ klDivFinitePMF Q P := by
   have key : ∀ h : H,
@@ -50,21 +60,19 @@ theorem klDivFinitePMF_nonneg {H : Type*} [Fintype H] (Q P : FinitePMF H)
         Finset.sum_le_sum (fun h _ => key h)
     _ = klDivFinitePMF Q P := rfl
 
-/-- **T3 (entropy floor / noisy-TV budget).** On a component whose restricted audit loss `E_S` is
-bounded below by its conditional entropy `HS` (which holds by `klDivFinitePMF_nonneg`), cumulative
-compression progress restricted to that component is bounded by the initial excess `E_S (g 0) − HS`.
-A pure-noise component therefore pays only a finite, vanishing budget.
-
-This is exactly `cumCP_le_of_lb` with `Emin := HS`: T3 is glue over T1. -/
-theorem entropy_floor_budget {ι : Type*} (E_S : ι → ℝ) (g : ℕ → ι) (T : ℕ) {HS : ℝ}
+/-- If `HS ≤ E_S (g T)`, then `cumCP E_S g T ≤ E_S (g 0) - HS` (schmidhuber2010). -/
+theorem entropy_floor_budget {ι : Type*} (E_S : AuditPotential ι) (g : AuditTrajectory ι) (T : ℕ)
+    {HS : ℝ}
     (hfloor : HS ≤ E_S (g T)) : cumCP E_S g T ≤ E_S (g 0) - HS :=
   cumCP_le_of_lb E_S g T hfloor
 
-/-- Shannon entropy of a finite pmf (same `0 * log(1/0) = 0` convention as the cross-entropy). -/
+/-- The Shannon entropy of the finite pmf `Q`, `∑ h, Q.prob h · log(1 / Q.prob h)`, with each term
+taken to be `0` where `Q(h) = 0` (shannon1948). -/
 noncomputable def entropyFinitePMF {H : Type*} [Fintype H] (Q : FinitePMF H) : ℝ :=
   ∑ h : H, if Q.prob h = 0 then 0 else Q.prob h * Real.log (1 / Q.prob h)
 
-/-- **Cross-entropy decomposition.** `H(Q,P) = H(Q) + KL(Q || P)` for a positive prior `P`. -/
+/-- Given a positive-prior `P`,
+`crossEntropyFinitePMF Q P = entropyFinitePMF Q + klDivFinitePMF Q P` (shannon1948; kullback1951). -/
 theorem crossEntropyFinitePMF_eq_entropy_add_kl {H : Type*} [Fintype H]
     (Q P : FinitePMF H) [HasPositivePrior P] :
     crossEntropyFinitePMF Q P = entropyFinitePMF Q + klDivFinitePMF Q P := by
@@ -79,23 +87,19 @@ theorem crossEntropyFinitePMF_eq_entropy_add_kl {H : Type*} [Fintype H]
     rw [Real.log_div hq hppos.ne']
     ring
 
-/-- **Gibbs floor (cross-entropy).** `H(Q) <= H(Q,P)`: cross-entropy is at least the entropy of the
-data distribution. This composes `klDivFinitePMF_nonneg` through the decomposition, so the floor is
-*derived*, not assumed. -/
+/-- Given a positive-prior `P`, `entropyFinitePMF Q ≤ crossEntropyFinitePMF Q P`. -/
 theorem entropy_le_crossEntropyFinitePMF {H : Type*} [Fintype H]
     (Q P : FinitePMF H) [HasPositivePrior P] :
     entropyFinitePMF Q ≤ crossEntropyFinitePMF Q P := by
   have hkl := klDivFinitePMF_nonneg Q P
   rw [crossEntropyFinitePMF_eq_entropy_add_kl Q P]; linarith
 
-/-- **T3 (entropy floor), composition mechanized.** Along any model trajectory `P ∘ g`, cumulative
-signed compression progress on the cross-entropy audit loss of a fixed data distribution `Q` is
-bounded by the initial excess over the entropy floor `H(Q)`. Unlike `entropy_floor_budget`, the
-floor `H(Q) <= E_S(theta)` is **discharged by Gibbs** (`entropy_le_crossEntropyFinitePMF`), not taken
-as a hypothesis: the floor-because-Gibbs link is machine-checked here, end to end. -/
+/-- Given a positive prior at every `P θ`,
+`cumCP (fun θ => crossEntropyFinitePMF Q (P θ)) g T ≤
+crossEntropyFinitePMF Q (P (g 0)) - entropyFinitePMF Q` (schmidhuber2010). -/
 theorem entropy_floor_budget_crossEntropy {ι H : Type*} [Fintype H]
     (Q : FinitePMF H) (P : ι → FinitePMF H) [∀ θ, HasPositivePrior (P θ)]
-    (g : ℕ → ι) (T : ℕ) :
+    (g : AuditTrajectory ι) (T : ℕ) :
     cumCP (fun θ => crossEntropyFinitePMF Q (P θ)) g T
       ≤ crossEntropyFinitePMF Q (P (g 0)) - entropyFinitePMF Q :=
   cumCP_le_of_lb (fun θ => crossEntropyFinitePMF Q (P θ)) g T
@@ -113,20 +117,23 @@ monotonicity of a finite expectation. -/
 section Conditional
 variable {ι X H : Type*} [Fintype X] [Fintype H]
 
-/-- Conditional (input-averaged) Shannon entropy `H(Y|X) = E_{x~μ} H(Q(·|x))`. -/
+/-- The conditional Shannon entropy of `Q` given input marginal `μ`,
+`∑ x, μ.prob x * entropyFinitePMF (Q x)` (shannon1948). -/
 noncomputable def condEntropyFinitePMF (μ : FinitePMF X) (Q : X → FinitePMF H) : ℝ :=
   ∑ x : X, μ.prob x * entropyFinitePMF (Q x)
 
-/-- Conditional cross-entropy `E_{x~μ} H(Q(·|x), P(·|x))`: the input-averaged log-loss risk. -/
+/-- The input-averaged cross-entropy of `Q` relative to `P` under `μ`,
+`∑ x, μ.prob x * crossEntropyFinitePMF (Q x) (P x)`. -/
 noncomputable def condCrossEntropyFinitePMF (μ : FinitePMF X) (Q P : X → FinitePMF H) : ℝ :=
   ∑ x : X, μ.prob x * crossEntropyFinitePMF (Q x) (P x)
 
-/-- Conditional KL `E_{x~μ} KL(Q(·|x) ‖ P(·|x))`. -/
+/-- The input-averaged Kullback–Leibler divergence of `Q` from `P` under `μ`,
+`∑ x, μ.prob x * klDivFinitePMF (Q x) (P x)` (kullback1951). -/
 noncomputable def condKLDivFinitePMF (μ : FinitePMF X) (Q P : X → FinitePMF H) : ℝ :=
   ∑ x : X, μ.prob x * klDivFinitePMF (Q x) (P x)
 
-/-- **Conditional cross-entropy decomposition.** `E_x H(Q,P) = H(Y|X) + E_x KL`: the
-input-averaged form of `crossEntropyFinitePMF_eq_entropy_add_kl`. -/
+/-- Given a positive prior at every `P x`,
+`condCrossEntropyFinitePMF μ Q P = condEntropyFinitePMF μ Q + condKLDivFinitePMF μ Q P`. -/
 theorem condCrossEntropyFinitePMF_eq_entropy_add_kl (μ : FinitePMF X) (Q P : X → FinitePMF H)
     [hP : ∀ x, HasPositivePrior (P x)] :
     condCrossEntropyFinitePMF μ Q P = condEntropyFinitePMF μ Q + condKLDivFinitePMF μ Q P := by
@@ -136,30 +143,27 @@ theorem condCrossEntropyFinitePMF_eq_entropy_add_kl (μ : FinitePMF X) (Q P : X 
   haveI := hP x
   rw [crossEntropyFinitePMF_eq_entropy_add_kl (Q x) (P x)]; ring
 
-/-- **Conditional finite Gibbs.** The input-averaged KL is nonnegative (positive priors). -/
+/-- Given a positive prior at every `P x`, `0 ≤ condKLDivFinitePMF μ Q P`. -/
 theorem condKLDivFinitePMF_nonneg (μ : FinitePMF X) (Q P : X → FinitePMF H)
     [hP : ∀ x, HasPositivePrior (P x)] : 0 ≤ condKLDivFinitePMF μ Q P := by
   refine Finset.sum_nonneg (fun x _ => ?_)
   haveI := hP x
   exact mul_nonneg (μ.prob_nonneg x) (klDivFinitePMF_nonneg (Q x) (P x))
 
-/-- **Conditional Gibbs floor.** `H(Y|X) ≤ E_{x~μ} H(Q(·|x), P(·|x))`: the input-averaged
-cross-entropy is at least the conditional entropy of the data. Derived from conditional Gibbs. -/
+/-- Given a positive prior at every `P x`,
+`condEntropyFinitePMF μ Q ≤ condCrossEntropyFinitePMF μ Q P`. -/
 theorem condEntropy_le_condCrossEntropy (μ : FinitePMF X) (Q P : X → FinitePMF H)
     [∀ x, HasPositivePrior (P x)] :
     condEntropyFinitePMF μ Q ≤ condCrossEntropyFinitePMF μ Q P := by
   have h := condKLDivFinitePMF_nonneg μ Q P
   rw [condCrossEntropyFinitePMF_eq_entropy_add_kl μ Q P]; linarith
 
-/-- **T3 (conditional entropy floor), composition mechanized.** For a fixed conditional data
-distribution `Q(·|x)` with input marginal `μ`, cumulative signed compression progress on the
-input-averaged cross-entropy audit loss along a model trajectory `P ∘ g` is bounded by the
-initial excess over the conditional entropy floor `H_{Q}(Y|X)`. This is the form stated in the
-paper: the floor `H(Y|X) ≤ E_S(θ)` is **discharged by conditional Gibbs**
-(`condEntropy_le_condCrossEntropy`, i.e. `E_S = H(Y|X) + E_x KL` with `E_x KL ≥ 0`), not assumed.
-The unconditional `entropy_floor_budget_crossEntropy` is the single-input special case. -/
+/-- Given a positive prior at every `P θ x`,
+`cumCP (fun θ => condCrossEntropyFinitePMF μ Q (P θ)) g T ≤
+condCrossEntropyFinitePMF μ Q (P (g 0)) - condEntropyFinitePMF μ Q`. -/
 theorem cond_entropy_floor_budget_crossEntropy (μ : FinitePMF X) (Q : X → FinitePMF H)
-    (P : ι → X → FinitePMF H) [hP : ∀ θ, ∀ x, HasPositivePrior (P θ x)] (g : ℕ → ι) (T : ℕ) :
+    (P : ι → X → FinitePMF H) [hP : ∀ θ, ∀ x, HasPositivePrior (P θ x)]
+    (g : AuditTrajectory ι) (T : ℕ) :
     cumCP (fun θ => condCrossEntropyFinitePMF μ Q (P θ)) g T
       ≤ condCrossEntropyFinitePMF μ Q (P (g 0)) - condEntropyFinitePMF μ Q := by
   haveI := hP (g T)

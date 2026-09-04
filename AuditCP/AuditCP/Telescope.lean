@@ -1,16 +1,22 @@
 import AuditCP.Basic
 
 /-!
-# T1 — exact telescoping (the definitional kernel)
+# Chapter 2 — the ledger is exact
 
-A4 honesty: this is a telescoping identity, not a deep theorem. It is the kernel that gives
-`cumCP` its meaning, and the substrate for T2 and T3. Mathlib anchor: `Finset.sum_range_sub'`.
+Two identities, both stated at B2 `AuditPotential` and B3 `AuditTrajectory` and nothing else.
+Their exactness is what the rest of the thesis spends: because `cumCP` is a difference of a
+potential and not a rectified sum, a closed path nets exactly zero at every horizon and for every
+potential, so no cycle pumps the ledger, and the audited quantity reads exactly two stages however
+long the trajectory is.
+
+This is a telescoping identity, the kernel that gives `cumCP` its meaning (Mathlib anchor:
+`Finset.sum_range_sub'`).
 -/
 
 namespace AuditCP
 
-/-- **T1 (telescoping).** Cumulative signed CP equals the net change in the potential. -/
-theorem cumCP_telescope {ι : Type*} (E : ι → ℝ) (g : ℕ → ι) (T : ℕ) :
+/-- Cumulative signed compression progress telescopes: `cumCP E g T = E (g 0) - E (g T)`. -/
+theorem cumCP_telescope {ι : Type*} (E : AuditPotential ι) (g : AuditTrajectory ι) (T : ℕ) :
     cumCP E g T = E (g 0) - E (g T) := by
   induction T with
   | zero => simp [cumCP]
@@ -18,10 +24,9 @@ theorem cumCP_telescope {ι : Type*} (E : ι → ℝ) (g : ℕ → ι) (T : ℕ)
       simp only [cumCP, Finset.sum_range_succ] at ih ⊢
       rw [ih]; ring
 
-/-- **T1 (budget).** With a lower bound `Emin ≤ E (g T)`, signed CP has a finite budget: it cannot
-diverge while the potential stays above `Emin`. -/
-theorem cumCP_le_of_lb {ι : Type*} (E : ι → ℝ) (g : ℕ → ι) (T : ℕ) {Emin : ℝ}
-    (hlb : Emin ≤ E (g T)) : cumCP E g T ≤ E (g 0) - Emin := by
+/-- If `Emin ≤ E (g T)`, then `cumCP E g T ≤ E (g 0) - Emin`. -/
+theorem cumCP_le_of_lb {ι : Type*} (E : AuditPotential ι) (g : AuditTrajectory ι) (T : ℕ)
+    {Emin : ℝ} (hlb : Emin ≤ E (g T)) : cumCP E g T ≤ E (g 0) - Emin := by
   rw [cumCP_telescope]; linarith
 
 end AuditCP

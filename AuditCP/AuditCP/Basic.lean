@@ -1,46 +1,64 @@
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import AuditCP.Vendored.FinitePMF
+import AuditCP.Base
 
 /-!
-# Audit-CP — representation grammar (types)
+# Chapter 1 — the audited objects
 
-Types derived via the typing-derivation URS (see ../URS_TYPING.json). The audit loss is kept
-ABSTRACT (`E : ι → ℝ`) for the telescoping/uniform-convergence theorems — maximally general,
-matching the manuscript; the concrete cross-entropy instantiation is `auditCE`. The admissibility
-concept bifurcates (see ../BREAKS.md, BP1): the deterministic half (`Admissible`, iterates-in-`F`)
-lives here; the probabilistic half (sealed-audit independence) lives in `FiniteExperts`.
+Every declaration here is a refinement of a base type of `AuditCP.Base`; none of them redefines
+one (schmidhuber1991; schmidhuber2010).  The concrete audit loss (`auditCE`) refines B2 `AuditPotential`; the signed ledger `cumCP`
+reads a B2 potential along a B3 `AuditTrajectory`; the two hypotheses of the whole argument
+(`UniformDev`, `Admissible`) are predicates on a B4 `AuditEnvelope`.
+
+The audit potential is kept abstract.  `cumCP`, `UniformDev` and `Admissible` mention no loss, no
+label, no probability and no cardinality: they are stated at B1/B2/B3/B4 and nothing else, which is
+why the same statements carry the finite-sample, conditional, adaptive and interface chapters
+without restatement.
 -/
 
 namespace AuditCP
 
-/-- A predictor maps each input to a predictive pmf over labels. Profile: **T-Abbrev**. -/
+/-- A predictor mapping each input `X` to a predictive finite probability mass function over
+labels `Y`. -/
 abbrev Predictor (X Y : Type*) [Fintype Y] := X → FinitePMF Y
 
-/-- Pointwise `ε`-floored cross-entropy audit loss of a predictive pmf at a label; bounded in
-`[0, -Real.log ε]` (cap `R ≈ -log ε`). Profile: **T-Abbrev**. -/
+/-- The `ε`-floored cross-entropy audit loss of the predictive pmf `p` at label `y`,
+`-log (max ε (p.prob y))` (dawid1984prequential). -/
 noncomputable def auditCE {Y : Type*} [Fintype Y] (ε : ℝ) (p : FinitePMF Y) (y : Y) : ℝ :=
   -Real.log (max ε (p.prob y))
 
-/-- Cumulative **signed** compression progress of a real potential `E` along an index-trajectory
-`g`, over `T` steps. Profile: **T-Parametric** (abstract over the index type `ι`).
+/-- Every point probability of a finite probability mass function is at most `1`. -/
+theorem finitePMF_prob_le_one {Y : Type*} [Fintype Y] (p : FinitePMF Y) (y : Y) :
+    p.prob y ≤ 1 := by
+  classical
+  calc
+    p.prob y ≤ ∑ z : Y, p.prob z :=
+      Finset.single_le_sum (fun z _ => p.prob_nonneg z) (Finset.mem_univ y)
+    _ = 1 := p.prob_sum_one
 
-The signed convention is load-bearing: the clipped variant
-`fun t => max 0 (E (g t) - E (g (t+1)))` is a different function and is NOT Goodhart-resistant
-(boundary B1; witnessed empirically by E3). It is deliberately not defined here. -/
-noncomputable def cumCP {ι : Type*} (E : ι → ℝ) (g : ℕ → ι) (T : ℕ) : ℝ :=
+/-- For `0 < ε ≤ 1`, the audit loss `auditCE ε p y` lies in the interval `[0, -log ε]`. -/
+theorem auditCE_mem_Icc {Y : Type*} [Fintype Y] (ε : ℝ) (p : FinitePMF Y) (y : Y)
+    (hε0 : 0 < ε) (hε1 : ε ≤ 1) :
+    auditCE ε p y ∈ Set.Icc 0 (-Real.log ε) := by
+  have hp1 : p.prob y ≤ 1 := finitePMF_prob_le_one p y
+  have hmax0 : 0 ≤ max ε (p.prob y) := le_trans hε0.le (le_max_left _ _)
+  have hmax1 : max ε (p.prob y) ≤ 1 := max_le hε1 hp1
+  have hlog_nonpos : Real.log (max ε (p.prob y)) ≤ 0 := Real.log_nonpos hmax0 hmax1
+  have hmax_pos : 0 < max ε (p.prob y) := lt_of_lt_of_le hε0 (le_max_left _ _)
+  have hlog_mono : Real.log ε ≤ Real.log (max ε (p.prob y)) :=
+    Real.strictMonoOn_log.monotoneOn hε0 hmax_pos (le_max_left _ _)
+  simp only [auditCE, Set.mem_Icc]
+  constructor <;> linarith
+
+/-- Cumulative signed compression progress of a potential `E` read along a trajectory `g` over
+`T` stages, ∑_{t < T} (E(g t) − E(g(t+1))) (schmidhuber1991; schmidhuber2010). -/
+noncomputable def cumCP {ι : Type*} (E : AuditPotential ι) (g : AuditTrajectory ι) (T : ℕ) : ℝ :=
   ∑ t ∈ Finset.range T, (E (g t) - E (g (t + 1)))
 
-/-- Uniform audit deviation: empirical and population audit losses agree to within `Δ` everywhere
-on the class `F`. The event (prob ≥ 1−δ) that controls the audit; its probability is discharged in
-`AuditCP.FiniteExperts`. Profile: **T-Prop**. -/
-def UniformDev {ι : Type*} (F : Set ι) (Ehat E : ι → ℝ) (Δ : ℝ) : Prop :=
+/-- The potentials `Ehat` and `E` agree to within `Δ` at every point of the envelope `F`. -/
+def UniformDev {ι : Type*} (F : AuditEnvelope ι) (Ehat E : AuditPotential ι) (Δ : ℝ) : Prop :=
   ∀ θ ∈ F, |Ehat θ - E θ| ≤ Δ
 
-/-- Audit-blind trajectory (deterministic half of admissibility): every iterate stays in `F`.
-This is all the finite-audit theorem needs — adaptivity is "free" because the uniform event covers
-all of `F` at once (no union bound over the horizon `T`). Profile: **T-Prop**. -/
-def Admissible {ι : Type*} (g : ℕ → ι) (F : Set ι) : Prop :=
+/-- Every stage of the trajectory `g` lies in the envelope `F`. -/
+def Admissible {ι : Type*} (g : AuditTrajectory ι) (F : AuditEnvelope ι) : Prop :=
   ∀ t, g t ∈ F
 
 end AuditCP
