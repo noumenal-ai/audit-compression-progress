@@ -1,0 +1,293 @@
+{
+  "note": "DINO-WM/DROID slice of the Audit-CP validity results. Every value is copied from the source record without rounding or recomputation. Two edits were made for publication: the absolute path under adapter_protocol.pca_path was reduced to its bare filename, and the absolute source_file path was removed. Recomputed and checked by experiments/dino_wm_droid_audit.py.",
+  "substrate": {
+    "substrate": "world_model_dino_wm_droid",
+    "dataset": "DINO-WM features over DROID robot data (frozen audit pool)",
+    "source_kind": "external_real",
+    "candidate_count": 7,
+    "candidate_ids": [
+      "identity",
+      "lora_rank_1",
+      "lora_rank_2",
+      "lora_rank_4",
+      "lora_rank_8",
+      "lora_rank_16",
+      "lora_rank_32"
+    ],
+    "adapter_protocol": {
+      "loss": "min(PCA-latent RMSE / train-only identity 99th-percentile cap, 1)",
+      "loss_cap": 1.2034612011244814,
+      "pca_dimension": 32,
+      "pca_path": "pca_and_protocol.npz",
+      "pca_sha256": "0da1aae48f68efa7eff55d07c314ea43b61c7fa3f3ddb555c16eadb6d52e2b4c",
+      "ridge_alpha": 0.001
+    },
+    "split_counts": {
+      "audit": 73,
+      "external": 24,
+      "proposal": 23,
+      "train": 72
+    },
+    "split_sha256": "d2d46e81126b024af97ba84257fad6d66527eb5f9241d39466773ba69921fc6c",
+    "frontier_scale": true,
+    "canonical_certificate_summary": {
+      "certified": false,
+      "accepted": 0,
+      "accepted_steps": 0,
+      "certified_cumulative_margin": 0.0,
+      "required_margin": 0.0,
+      "trajectories_with_acceptance": 0,
+      "trajectory_acceptance_rate": 0.0,
+      "initial_parent": 0,
+      "final_parent": 0,
+      "decisions": 3,
+      "decision_naive_violations": 0,
+      "decision_naive_violation_rate": 0.0,
+      "decision_violations": 0,
+      "decision_violation_rate": 0.0,
+      "decision_violation_rate_95cp": [
+        0.0,
+        0.7075982261787133
+      ],
+      "decision_false_accepts": 0,
+      "decision_false_accept_rate": 0.0,
+      "familywise_naive_violations": 0,
+      "familywise_naive_violation_rate": 0.0,
+      "familywise_violations": 0,
+      "familywise_violation_rate": 0.0,
+      "familywise_violation_rate_95cp": [
+        0.0,
+        0.975
+      ],
+      "familywise_violation_excess_pvalue": 1.0,
+      "familywise_false_accepts": 0,
+      "familywise_false_accept_rate": 0.0,
+      "familywise_false_accept_rate_95cp": [
+        0.0,
+        0.975
+      ],
+      "familywise_false_accept_excess_pvalue": 1.0,
+      "median_pac_bayes_radius_with_floor": 0.009781795008722862,
+      "p90_pac_bayes_radius_with_floor": 0.009917175317425976,
+      "uniform_radius_all_candidates_at_max_checkpoint": 0.007069708373190479,
+      "pac_bayes_tighter_than_uniform_fraction": 0.0,
+      "audit_cp_endpoint_budget_all_candidates_at_max_checkpoint": 0.007434317035927038,
+      "median_kl": 0.0028826239091633166,
+      "median_selected_checkpoint": 262144.0,
+      "checkpoints": [
+        8192,
+        16384,
+        32768,
+        65536,
+        131072,
+        262144
+      ],
+      "lambda_grid": [
+        0.015625,
+        0.03125,
+        0.0625,
+        0.125,
+        0.25,
+        0.5,
+        1.0
+      ],
+      "posterior_floor": 1e-06,
+      "prior_center_mass": 0.85,
+      "delta": 0.01,
+      "per_substrate_delta": 0.01,
+      "family_delta": 0.04,
+      "joint_spend": 0.04,
+      "expected_substrates": 4,
+      "repetitions": 1,
+      "rounds_per_repetition": 3,
+      "round_weights": [
+        0.6666666666666666,
+        0.2222222222222222,
+        0.1111111111111111
+      ],
+      "coverage_unit": "one complete adaptive trajectory (familywise across all configured rounds/checkpoints)",
+      "audit_law": "uniform empirical distribution over frozen audit pool; IID sampling with replacement",
+      "audit_draws_path": "outputs/world_model/dino_wm_droid/canonical_audit_draws.npz",
+      "audit_draws_sha256": "5034d50d72eebc511cc6db16cc807032ba9b3b70e0235d7ddc1968da508a575d",
+      "seed": 20361362,
+      "trace_kind": "predeclared_canonical_certificate",
+      "_fields_absent_in_source_block": []
+    },
+    "certificate_summary": {
+      "accepted": 0,
+      "required_margin": 0.0,
+      "trajectories_with_acceptance": 0,
+      "trajectory_acceptance_rate": 0.0,
+      "decisions": 3000,
+      "decision_naive_violations": 0,
+      "decision_naive_violation_rate": 0.0,
+      "decision_violations": 0,
+      "decision_violation_rate": 0.0,
+      "decision_violation_rate_95cp": [
+        0.0,
+        0.0012288708038255115
+      ],
+      "decision_false_accepts": 0,
+      "decision_false_accept_rate": 0.0,
+      "familywise_naive_violations": 0,
+      "familywise_naive_violation_rate": 0.0,
+      "familywise_violations": 0,
+      "familywise_violation_rate": 0.0,
+      "familywise_violation_rate_95cp": [
+        0.0,
+        0.003682083896865671
+      ],
+      "familywise_violation_excess_pvalue": 1.0,
+      "familywise_false_accepts": 0,
+      "familywise_false_accept_rate": 0.0,
+      "familywise_false_accept_rate_95cp": [
+        0.0,
+        0.003682083896865671
+      ],
+      "familywise_false_accept_excess_pvalue": 1.0,
+      "median_pac_bayes_radius_with_floor": 0.04081685329412009,
+      "p90_pac_bayes_radius_with_floor": 0.04352445946818237,
+      "uniform_radius_all_candidates_at_max_checkpoint": 0.03473407073152166,
+      "pac_bayes_tighter_than_uniform_fraction": 0.0,
+      "audit_cp_endpoint_budget_all_candidates_at_max_checkpoint": 0.037090174648567543,
+      "median_kl": 0.0028826239091633166,
+      "median_selected_checkpoint": 8192.0,
+      "checkpoints": [
+        64,
+        128,
+        256,
+        512,
+        1024,
+        2048,
+        4096,
+        8192
+      ],
+      "lambda_grid": [
+        0.015625,
+        0.03125,
+        0.0625,
+        0.125,
+        0.25,
+        0.5,
+        1.0
+      ],
+      "posterior_floor": 1e-06,
+      "prior_center_mass": 0.85,
+      "delta": 0.05,
+      "repetitions": 1000,
+      "rounds_per_repetition": 3,
+      "round_weights": [
+        0.6666666666666666,
+        0.2222222222222222,
+        0.1111111111111111
+      ],
+      "coverage_unit": "one complete adaptive trajectory (familywise across all configured rounds/checkpoints)",
+      "audit_law": "uniform empirical distribution over frozen audit pool; IID sampling with replacement",
+      "_fields_absent_in_source_block": [
+        "certified",
+        "accepted_steps",
+        "certified_cumulative_margin",
+        "initial_parent",
+        "final_parent",
+        "per_substrate_delta",
+        "family_delta",
+        "joint_spend",
+        "expected_substrates",
+        "audit_draws_path",
+        "audit_draws_sha256",
+        "seed",
+        "trace_kind"
+      ]
+    },
+    "trajectory_endpoint_summary": {
+      "trajectories": 1000,
+      "cumulative_margin_violations": 0,
+      "mean_certified_cumulative_margin": 0.0,
+      "mean_exact_audit_improvement": 0.0,
+      "mean_external_holdout_improvement": 0.0,
+      "external_holdout_used_for_selection": false,
+      "external_improvement_positive_fraction": 0.0,
+      "audit_external_improvement_sign_agreement": 1.0,
+      "_fields_absent_in_source_block": []
+    }
+  },
+  "claim": {
+    "substrate": "world_model_dino_wm_droid",
+    "substrate_description": "DINO-WM features over DROID robot data (frozen audit pool)",
+    "candidate_count": 7,
+    "candidate_ids": [
+      "identity",
+      "lora_rank_1",
+      "lora_rank_2",
+      "lora_rank_4",
+      "lora_rank_8",
+      "lora_rank_16",
+      "lora_rank_32"
+    ],
+    "canonical": {
+      "certified": false,
+      "accepted": 0,
+      "required_margin": 0.0,
+      "certified_cumulative_margin": 0.0,
+      "median_pac_bayes_radius_with_floor": 0.009781795008722862,
+      "p90_pac_bayes_radius_with_floor": 0.009917175317425976,
+      "median_kl": 0.0028826239091633166,
+      "median_selected_checkpoint": 262144.0,
+      "checkpoints": [
+        8192,
+        16384,
+        32768,
+        65536,
+        131072,
+        262144
+      ],
+      "lambda_grid": [
+        0.015625,
+        0.03125,
+        0.0625,
+        0.125,
+        0.25,
+        0.5,
+        1.0
+      ],
+      "posterior_floor": 1e-06,
+      "prior_center_mass": 0.85,
+      "audit_cp_endpoint_budget_all_candidates_at_max_checkpoint": 0.007434317035927038,
+      "uniform_radius_all_candidates_at_max_checkpoint": 0.007069708373190479,
+      "pac_bayes_tighter_than_uniform_fraction": 0.0,
+      "audit_draws_path": "outputs/world_model/dino_wm_droid/canonical_audit_draws.npz",
+      "audit_draws_sha256": "5034d50d72eebc511cc6db16cc807032ba9b3b70e0235d7ddc1968da508a575d",
+      "audit_law": "uniform empirical distribution over frozen audit pool; IID sampling with replacement",
+      "delta": 0.01,
+      "family_delta": 0.04,
+      "joint_spend": 0.04,
+      "coverage_unit": "one complete adaptive trajectory (familywise across all configured rounds/checkpoints)",
+      "seed": 20361362,
+      "trace_kind": "predeclared_canonical_certificate"
+    },
+    "repetition_sweep": {
+      "accepted": 0,
+      "median_pac_bayes_radius_with_floor": 0.04081685329412009,
+      "p90_pac_bayes_radius_with_floor": 0.04352445946818237,
+      "median_kl": 0.0028826239091633166,
+      "median_selected_checkpoint": 8192.0,
+      "checkpoints": [
+        64,
+        128,
+        256,
+        512,
+        1024,
+        2048,
+        4096,
+        8192
+      ],
+      "audit_cp_endpoint_budget_all_candidates_at_max_checkpoint": 0.037090174648567543,
+      "uniform_radius_all_candidates_at_max_checkpoint": 0.03473407073152166,
+      "pac_bayes_tighter_than_uniform_fraction": 0.0,
+      "delta": 0.05,
+      "repetitions": 1000,
+      "decisions": 3000
+    },
+    "reading": "REFUSAL, not vacuity. The certificate is computable at this scale and its radius is finite and small; certified=false with accepted=0 records that no candidate cleared the requirement under the sealed audit. This is not a certification and must not be presented as one."
+  }
+}

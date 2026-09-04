@@ -69,3 +69,72 @@ The question count of 11,759 is the 11,829 MMLU-ProX test items less the 70 item
 reserved as few-shot demonstrations. The 29 presentations translate a single question
 set, so a question identity is the independent unit and language-question cells are not
 counted separately.
+
+## DINO-WM/DROID world-model audit
+
+`dino_wm_droid_audit.py` recomputes the Audit-CP endpoint numbers for the world-model
+substrate and asserts each published value. It reads the archived record in
+`results_data/dino_wm_droid_validity.json` and runs offline on the Python 3 standard
+library, with no GPU.
+
+```
+python3 dino_wm_droid_audit.py             # print the table and check every value
+python3 dino_wm_droid_audit.py --data PATH # read the archived record from elsewhere
+```
+
+The script exits nonzero if any published value fails to reproduce.
+
+### What it computes
+
+The substrate is a frozen pool of DINO-WM latent features computed over DROID robot
+manipulation episodes, split into 72 train, 23 proposal, 73 audit and 24 external
+episodes. Seven candidates were declared before the audit ran: the identity map, and LoRA
+adapters of rank 1, 2, 4, 8, 16 and 32. Each candidate is scored by
+`min(PCA-latent RMSE / train-only identity 99th-percentile cap, 1)` on a 32-dimensional
+PCA latent fitted with ridge coefficient 1e-3. The cap that divides the RMSE is
+1.2034612011244814. The clip at 1 puts the loss in [0, 1] and so fixes the loss range at
+R = 1.
+
+The certificate was computed on the checkpoint ladder 8192, 16384, 32768, 65536, 131072,
+262144, and the largest rung supplies the endpoint values. Pricing uses route (c), the
+fixed panel with a declared finite candidate set, whose per-endpoint radius is
+`Delta = R sqrt(ln(2N/delta) / (2n))`. At N = 7 candidates, delta = 0.01, R = 1 and
+n = 65536 audit draws, that radius is 0.007434317. A signed improvement compares two
+endpoint levels and each one can deviate, so the slack it must clear is twice the radius:
+0.01487, which is 1.49% of the bounded loss range.
+
+Both radii are recomputed from N, n, R and delta and agree with the archived values to the
+last bit of a double. The audit draw count n is not stored in the record, so the script
+recovers it by solving the endpoint radius for n. R is pinned at 1 by the clip in the loss
+definition, so that inversion has a single solution.
+
+`uniform_radius_all_candidates_at_max_checkpoint`, 0.007069708373190479, is a separate
+quantity in the same record. It drops the factor two inside the logarithm, and it is not
+the radius that the two-endpoint slack doubles. The script prints both and checks both.
+
+The audit refused on this substrate. `certified` is false and `accepted` is 0, the
+required margin is 0, and the parent candidate is the identity map at both ends of the
+trajectory. The identity map was best throughout, so the run reports no positive lower
+bound on improvement here. What the run does establish is that the certificate is
+computable at frontier world-model scale with a slack of 1.49% of the bounded loss range,
+which is the threshold a signed improvement would have had to clear.
+
+### Data provenance
+
+`results_data/dino_wm_droid_validity.json` holds the substrate block, the claim block and
+the adapter protocol, copied from the audit's own results file without rounding and
+without recomputation. Two edits were applied for publication: the absolute path under
+`adapter_protocol.pca_path` was reduced to its bare filename, and the absolute
+`source_file` path was removed. No numeric value was altered.
+
+The features and the episodes come from two external releases and are not results of this
+repository.
+
+> Gaoyue Zhou, Hengkai Pan, Yann LeCun and Lerrel Pinto. DINO-WM: World Models on
+> Pre-trained Visual Features Enable Zero-Shot Planning. arXiv:2411.04983, 2025.
+> doi:10.48550/arXiv.2411.04983.
+
+> Alexander Khazatsky, Karl Pertsch, Suraj Nair, Ashwin Balakrishna, Sudeep Dasari,
+> Siddharth Karamcheti, Soroush Nasiriany, Mohan Kumar Srirama, Lawrence Yunliang Chen,
+> Kirsty Ellis and others. DROID: A Large-Scale In-the-Wild Robot Manipulation Dataset.
+> arXiv:2403.12945, 2024. doi:10.48550/arXiv.2403.12945.
