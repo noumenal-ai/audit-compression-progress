@@ -28,26 +28,31 @@ stops before the first optimiser step.
 The independent audit unit is the EXAMPLE (one padded 30x30 ARC-TGI grid), not the cell.
 Cells inside one grid are dependent, so n = 12288 examples is the conservative count.
 
-What the archived level is, and what route (c) prices
------------------------------------------------------
+What the archived level is, and what prices it
+----------------------------------------------
 `audit_panel_loss` returns `floored_ce` = (total floored CE over every content cell of the
 panel) / (total content cells). That is a CONTENT-CELL-WEIGHTED ratio, sum_i w_i m_i with
-w_i = c_i / sum_j c_j; it computes no per-example value, and ARC-TGI grids run from 1x1 to
-30x30, so the weights vary. Route (c)'s radius Delta = R*sqrt(ln(2N/delta)/(2n)) is Hoeffding
-for the UNWEIGHTED mean of n bounded terms. For the weighted level the radius is
-Delta*sqrt(n/n_eff) with n_eff = (sum_i c_i)^2 / sum_i c_i^2 <= n, so the published Delta is
-too small for it, always in the same direction.
+w_i = c_i / sum_j c_j; ARC-TGI grids run from 1x1 to 30x30, so the weights vary. Hoeffding for
+a weighted mean of n bounded terms gives radius R*sqrt(sum_i w_i^2 * ln(2N/delta) / 2), which is
+the unweighted radius R*sqrt(ln(2N/delta)/(2n)) inflated by sqrt(n/n_eff) with
 
-The archived L0/LT values in this file are the cell-weighted level, measured before
-`audit_panel_loss` reported anything else, and no cell counts were stored, so n_eff cannot be
-recovered from the record. What the record does fix is the threshold: the reported gain stays
-above the corrected slack for every n_eff above 2*R^2*ln(2N/delta)/G^2, which the aggregate
-block below computes and stores as `n_effective_required_for_positive_bound`.
+    n_eff = 1 / sum_i w_i^2 = (sum_i c_i)^2 / sum_i c_i^2 <= n     (Cauchy-Schwarz).
 
-A re-run of this script now measures both levels and n_eff: `audit_panel_loss` returns
-`floored_ce_per_example` (the unweighted mean of per-example means, which route (c) prices
-exactly) and `sum_cells`, `sum_cells_sq`, `n_effective` beside the archived `floored_ce`.
-Both are recorded per seed so the two can be compared directly.
+The slack in this record is therefore priced at n_eff, not at n. The unweighted radius is kept
+under `aggregate.unweighted_reference` for comparison only; it prices nothing here.
+
+The cell counts are recoverable exactly: panel B is a deterministic function of the seed
+(`panel(seed + 2000, ...)`), and a re-measure reproduces the archived L0 to the last bit, which
+is the proof that the regenerated panel is the panel the archived levels were scored on. Every
+row therefore carries `sum_cells`, `sum_cells_sq` and `n_effective`, and the aggregate refuses
+to run on a row that lacks them. `L0_unweighted`, the unweighted mean of per-record means, is
+stored beside `L0` for reference; the C1 shards hold no unweighted terminal level, so the
+unweighted five numbers cannot be formed from this record and are not reported.
+
+Headline convention: the aggregate slack is the single-panel slack at the mean n_eff over seeds,
+and each per-seed lower bound is priced at that seed's own n_eff. Neither is a simultaneous
+statement across seeds.
+
 
 Usage
 -----
@@ -93,15 +98,16 @@ N_EXPECTED = 12288              # independent audit units (examples, not cells)
 
 # The paper's reported values, asserted at the end of every run.
 VALIDATION_TARGET = {
-    "Delta": 0.056421,
-    "slack_Gamma": 0.112841,
+    "n_effective": 6521.8,
+    "Delta": 0.077445,
+    "slack_Gamma": 0.154891,
     "mean_L0": 2.4841,
     "mean_LT": 1.7476,
     "mean_G": 0.7366,
-    "lower_bound_on_improvement": 0.6237,
-    "discrimination_ratio": 6.53,
-    "per_seed_lower_bound_min": 0.5266,
-    "per_seed_lower_bound_max": 0.6981,
+    "lower_bound_on_improvement": 0.5817,
+    "discrimination_ratio": 4.76,
+    "per_seed_lower_bound_min": 0.4844,
+    "per_seed_lower_bound_max": 0.6561,
     "per_seed_positive_count": 20,
 }
 
@@ -154,8 +160,7 @@ def measure_L0(seed: int) -> Dict:
         "cfg": {"grid": cfg.grid, "audit_per_family": cfg.audit_per_family,
                 "steps": cfg.steps, "batch": cfg.batch, "model": cfg.model},
     }
-    # Measured only on a re-run: the unweighted level route (c) actually prices, and the
-    # effective sample size of the weighted one. Absent from the archived rows.
+    # The unweighted level (reference) and the effective sample size that prices the weighted one.
     if "floored_ce_per_example" in ap:
         row["L0_unweighted"] = float(ap["floored_ce_per_example"])
     for key in ("sum_cells", "sum_cells_sq", "n_effective"):
@@ -197,6 +202,19 @@ def route_c_slack(n: int, card_A: int = CARD_A, eps: float = EPS,
     return {"Delta": Delta, "slack_Gamma": 2.0 * Delta}
 
 
+def route_c_slack_at(n_priced: float, card_A: int = CARD_A, eps: float = EPS,
+                     delta: float = DELTA) -> Dict[str, float]:
+    """Fixed-panel slack priced at `n_priced` bounded terms.
+
+        Delta = R * sqrt( ln(2N/delta) / (2 n_priced) ),   Gamma = 2 * Delta
+
+    For an unweighted mean n_priced is the record count n. For the archived cell-weighted
+    ratio it is n_eff = (sum_i c_i)^2 / sum_i c_i^2, Hoeffding's sample size for a weighted mean.
+    """
+    Delta = (-math.log(eps)) * math.sqrt(math.log(2.0 * card_A / delta) / (2.0 * n_priced))
+    return {"Delta": Delta, "slack_Gamma": 2.0 * Delta}
+
+
 def aggregate(per_seed: Dict[str, Dict]) -> Dict:
     seeds = sorted(int(k) for k in per_seed)
     rows = [per_seed[str(s)] for s in seeds]
@@ -208,21 +226,37 @@ def aggregate(per_seed: Dict[str, Dict]) -> Dict:
     if n != N_EXPECTED:
         print(f"WARNING: panel size {n} != the camera-ready {N_EXPECTED}", file=sys.stderr)
 
+    missing = [r["seed"] for r in rows if "n_effective" not in r]
+    if missing:
+        raise ValueError(
+            "rows without n_effective: %s. The archived level is a cell-weighted ratio and is "
+            "priced at n_eff; re-measure these seeds with "
+            "`python3 c1_panelB_initial_loss.py --force --seeds %s`."
+            % (missing, ",".join(str(s) for s in missing)))
+
     L0 = [r["L0"] for r in rows]
     LT = [r["LT"] for r in rows]
     G = [r["G"] for r in rows]
+    n_eff_rows = [float(r["n_effective"]) for r in rows]
+    n_eff = _mean(n_eff_rows)
 
-    sl = route_c_slack(n)
+    # Headline: the single-panel slack at the mean effective size.
+    sl = route_c_slack_at(n_eff)
     Gamma = sl["slack_Gamma"]
     mean_G = _mean(G)
-    per_seed_lb = [g - Gamma for g in G]
 
-    # n_eff, when a re-run measured it. The archived rows do not carry the cell counts.
-    n_eff_rows = [float(r["n_effective"]) for r in rows if "n_effective" in r]
-    n_eff = _mean(n_eff_rows) if n_eff_rows else None
-    # The threshold the record does fix: the corrected slack Gamma*sqrt(n/n_eff) stays below the
-    # reported gain exactly while n_eff exceeds this.
+    # Per seed: each panel is its own draw and is priced at its own n_eff.
+    per_seed_slack = [route_c_slack_at(x)["slack_Gamma"] for x in n_eff_rows]
+    per_seed_lb = [g - s for g, s in zip(G, per_seed_slack)]
+    per_seed_ratio = [g / s for g, s in zip(G, per_seed_slack)]
+
+    # Reference only: the radius the same panel would give an unweighted mean of n records.
+    sl_unw = route_c_slack(n)
+
+    # The n_eff below which the sign of the headline bound would go.
     n_eff_needed = int(math.ceil(2.0 * R * R * math.log(2.0 * CARD_A / DELTA) / (mean_G ** 2)))
+
+    L0_unw = [float(r["L0_unweighted"]) for r in rows if "L0_unweighted" in r]
 
     return {
         "n_seeds": len(seeds),
@@ -230,58 +264,59 @@ def aggregate(per_seed: Dict[str, Dict]) -> Dict:
         "n_independent_audit_units": n,
         "independent_unit": "example (one padded 30x30 ARC-TGI grid); NOT the cell",
         "estimator": "content_cell_weighted_ratio",
-        "estimator_note": (
-            "L0 and LT are audit_panel_loss's floored_ce: total floored CE over every content "
-            "cell of the panel divided by the total content-cell count. That is sum_i w_i m_i "
-            "with w_i = c_i / sum_j c_j, not the unweighted mean of n per-example losses, and "
-            "route (c)'s Delta is the radius of the unweighted mean. The corrected radius is "
-            "Delta*sqrt(n/n_eff) with n_eff = (sum_i c_i)^2 / sum_i c_i^2 <= n, so Delta below "
-            "is too small for this estimator whenever the grids differ in size, which they do."),
-        "n_effective": n_eff,
-        "n_effective_note": (
-            ("mean over the %d seeds that carry per-example content-cell counts; the corrected "
-             "radius is Delta*sqrt(n/n_eff)." % len(n_eff_rows)) if n_eff_rows else
-            ("null: the archived measurement stored no per-example content-cell counts, so n_eff "
-             "is not recoverable from this record. A re-run of c1_panelB_initial_loss.py stores "
-             "sum_cells, sum_cells_sq and n_effective per seed, and L0_unweighted beside L0.")),
-        "n_effective_required_for_positive_bound": n_eff_needed,
-        "n_effective_required_note": (
-            "2*R^2*ln(2N/delta)/G^2 at the mean gain: the corrected lower bound stays positive "
-            "for every n_eff above this, out of n = %d records. Since n_eff >= n*mean(c)/max(c) "
-            "and max(c) <= 900 on a 30x30 canvas, a mean above %.1f content cells per example is "
-            "sufficient on its own. Neither quantity is settled by this record."
-            % (n, 900.0 * n_eff_needed / n)),
-        "loss_range_R": R,
         "delta": DELTA,
         "candidate_set_size_N": CARD_A,
+        "loss_range_R": R,
         "slack_route": "c",
+        "n_effective": n_eff,
+        "n_effective_per_seed": {"min": min(n_eff_rows), "max": max(n_eff_rows),
+                                 "mean": n_eff, "sd": _sd(n_eff_rows),
+                                 "values": {str(s): x for s, x in zip(seeds, n_eff_rows)}},
+        "n_effective_definition": "(sum_i c_i)^2 / sum_i c_i^2 over the content-cell counts c_i of the panel's n records",
+        "priced_at": ("n_effective: the headline Delta and slack are the single-panel values at the "
+                      "mean n_eff over seeds; per-seed bounds are priced at each seed's own n_eff"),
         "Delta": sl["Delta"],
         "slack_Gamma": Gamma,
+        "unweighted_reference": {
+            "Delta": sl_unw["Delta"], "slack_Gamma": sl_unw["slack_Gamma"],
+            "note": ("the radius of an unweighted mean of n records, for comparison only; it is "
+                     "not the radius of the archived estimator and prices nothing in this record")},
         "L0": {"mean": _mean(L0), "sd": _sd(L0), "min": min(L0), "max": max(L0)},
         "LT": {"mean": _mean(LT), "sd": _sd(LT), "min": min(LT), "max": max(LT)},
         "G": {"mean": mean_G, "sd": _sd(G), "min": min(G), "max": max(G)},
+        "L0_unweighted": ({"mean": _mean(L0_unw), "sd": _sd(L0_unw), "min": min(L0_unw),
+                           "max": max(L0_unw),
+                           "note": ("unweighted mean of per-record means at theta_0, for reference; "
+                                    "no unweighted terminal level exists in the C1 shards, so no "
+                                    "unweighted gain or bound is formed")}
+                          if len(L0_unw) == len(rows) else None),
         "lower_bound_on_improvement": mean_G - Gamma,
         "discrimination_ratio": mean_G / Gamma,
         "bound_reading": (
-            "the lower bound and the ratio above are the published route (c) arithmetic and are "
-            "exact for an unweighted mean of n per-example losses. The archived level is the "
-            "cell-weighted ratio, so under that estimator the supported statement is conditional: "
-            "the bound is positive exactly while n_eff > %d." % n_eff_needed),
+            "mean gain over seeds less the single-panel slack at the mean n_eff; positive, so the "
+            "run has improved on the sealed panel by at least this much at confidence 1 - delta"),
+        "n_effective_required_for_positive_bound": n_eff_needed,
+        "n_effective_required_note": (
+            "the headline bound is positive for every n_eff above this; the measured n_eff is "
+            "%.1f, %.0f times the threshold" % (n_eff, n_eff / max(n_eff_needed, 1))),
+        "per_seed_slack": {"min": min(per_seed_slack), "max": max(per_seed_slack)},
         "per_seed_lower_bound": {
             "min": min(per_seed_lb),
             "max": max(per_seed_lb),
             "positive_count": sum(1 for v in per_seed_lb if v > 0),
-            "note": ("each seed draws its own independent panel B, so this is the "
-                     "single-seed statement at delta=0.05 applied seed by seed; it is not "
-                     "a simultaneous 95% statement across all 20 seeds, which would need a "
-                     "union bound over seeds"),
+            "values": {str(s): v for s, v in zip(seeds, per_seed_lb)},
+            "note": ("each seed draws its own independent panel B and is priced at its own n_eff; "
+                     "this is the single-seed statement at delta=0.05 applied seed by seed, not a "
+                     "simultaneous 95% statement across all 20 seeds"),
         },
+        "per_seed_discrimination_ratio": {"min": min(per_seed_ratio), "max": max(per_seed_ratio)},
     }
 
 
 def check_validation_target(agg: Dict) -> bool:
     """Assert the aggregate reproduces the values reported in the paper."""
     got = {
+        "n_effective": agg["n_effective"],
         "Delta": agg["Delta"],
         "slack_Gamma": agg["slack_Gamma"],
         "mean_L0": agg["L0"]["mean"],
@@ -340,8 +375,8 @@ def write_out(per_seed: Dict[str, Dict], agg: Optional[Dict]) -> None:
                 "sum over panel content cells of the floored CE, divided by the total content-cell "
                 "count: a weighted mean of the per-example means with weights proportional to each "
                 "example's content-cell count, not their unweighted mean"),
-            "n_effective": None,
-            "priced_by_route_c_delta": False,
+            "n_effective": (agg["n_effective"] if agg is not None else None),
+            "priced_at": "n_effective; see aggregate.priced_at",
         },
         "panel": {
             "name": "B",
@@ -368,12 +403,11 @@ def write_out(per_seed: Dict[str, Dict], agg: Optional[Dict]) -> None:
             "LT": "L_B(theta_T), the terminal audit level, content-cell-weighted",
             "G": "signed gain L0 - LT",
             "n_panel": "independent audit units in panel B (examples, not cells)",
-            "L0_unweighted": ("L_B(theta_0) as the unweighted mean of per-example means, which is "
-                              "what route (c)'s Delta prices; present only on rows re-measured "
-                              "after cp_models.audit_panel_loss began returning it"),
-            "sum_cells": "sum_i c_i, content cells in panel B; re-measured rows only",
-            "sum_cells_sq": "sum_i c_i^2; re-measured rows only",
-            "n_effective": "(sum_i c_i)^2 / sum_i c_i^2; re-measured rows only",
+            "L0_unweighted": ("L_B(theta_0) as the unweighted mean of per-example means, for "
+                              "reference; the C1 shards hold no unweighted terminal level"),
+            "sum_cells": "sum_i c_i, content cells in panel B",
+            "sum_cells_sq": "sum_i c_i^2",
+            "n_effective": "(sum_i c_i)^2 / sum_i c_i^2; the sample size the slack is priced at",
         },
         "generated_by": "experiments/c1_panelB_initial_loss.py",
         "per_seed": {str(s): per_seed[str(s)] for s in sorted(int(k) for k in per_seed)},
@@ -429,7 +463,10 @@ def main() -> int:
     print(f"\nwrote {OUT_JSON}")
     print(f"  n = {agg['n_independent_audit_units']} independent audit units, "
           f"R = {agg['loss_range_R']:.9f}, delta = {agg['delta']}, N = {agg['candidate_set_size_N']}")
-    print(f"  Delta = {agg['Delta']:.6f}   slack Gamma = {agg['slack_Gamma']:.6f}")
+    print(f"  n_eff = {agg['n_effective']:.1f} (per seed {agg['n_effective_per_seed']['min']:.1f}"
+          f" .. {agg['n_effective_per_seed']['max']:.1f})")
+    print(f"  Delta = {agg['Delta']:.6f}   slack Gamma = {agg['slack_Gamma']:.6f}   "
+          f"(unweighted reference {agg['unweighted_reference']['slack_Gamma']:.6f})")
     print(f"  mean L0 = {agg['L0']['mean']:.4f} (sd {agg['L0']['sd']:.4f})")
     print(f"  mean LT = {agg['LT']['mean']:.4f} (sd {agg['LT']['sd']:.4f})")
     print(f"  mean G  = {agg['G']['mean']:.4f} (sd {agg['G']['sd']:.4f})")

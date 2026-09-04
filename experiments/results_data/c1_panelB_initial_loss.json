@@ -10,8 +10,8 @@
     "range_R": 4.605170185988091,
     "estimator": "content_cell_weighted_ratio",
     "estimator_definition": "sum over panel content cells of the floored CE, divided by the total content-cell count: a weighted mean of the per-example means with weights proportional to each example's content-cell count, not their unweighted mean",
-    "n_effective": null,
-    "priced_by_route_c_delta": false
+    "n_effective": 6521.7537414292365,
+    "priced_at": "n_effective; see aggregate.priced_at"
   },
   "panel": {
     "name": "B",
@@ -27,10 +27,10 @@
     "LT": "L_B(theta_T), the terminal audit level, content-cell-weighted",
     "G": "signed gain L0 - LT",
     "n_panel": "independent audit units in panel B (examples, not cells)",
-    "L0_unweighted": "L_B(theta_0) as the unweighted mean of per-example means, which is what route (c)'s Delta prices; present only on rows re-measured after cp_models.audit_panel_loss began returning it",
-    "sum_cells": "sum_i c_i, content cells in panel B; re-measured rows only",
-    "sum_cells_sq": "sum_i c_i^2; re-measured rows only",
-    "n_effective": "(sum_i c_i)^2 / sum_i c_i^2; re-measured rows only"
+    "L0_unweighted": "L_B(theta_0) as the unweighted mean of per-example means, for reference; the C1 shards hold no unweighted terminal level",
+    "sum_cells": "sum_i c_i, content cells in panel B",
+    "sum_cells_sq": "sum_i c_i^2",
+    "n_effective": "(sum_i c_i)^2 / sum_i c_i^2; the sample size the slack is priced at"
   },
   "generated_by": "experiments/c1_panelB_initial_loss.py",
   "per_seed": {
@@ -47,7 +47,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.4637557615836463,
+      "sum_cells": 1657069.0,
+      "sum_cells_sq": 422072874.0,
+      "n_effective": 6505.695674631296
     },
     "1": {
       "status": "ok",
@@ -62,7 +66,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.5142966359853745,
+      "sum_cells": 1630602.0,
+      "sum_cells_sq": 404778635.0,
+      "n_effective": 6568.683849640433
     },
     "2": {
       "status": "ok",
@@ -77,7 +85,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.482469449440638,
+      "sum_cells": 1660580.0,
+      "sum_cells_sq": 425019257.0,
+      "n_effective": 6488.0023457384195
     },
     "3": {
       "status": "ok",
@@ -92,7 +104,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.498081306616465,
+      "sum_cells": 1641188.0,
+      "sum_cells_sq": 418076547.0,
+      "n_effective": 6442.595430601851
     },
     "4": {
       "status": "ok",
@@ -107,7 +123,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.5615075627962747,
+      "sum_cells": 1668681.0,
+      "sum_cells_sq": 431290986.0,
+      "n_effective": 6456.189371323889
     },
     "5": {
       "status": "ok",
@@ -122,7 +142,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.482101152340571,
+      "sum_cells": 1650279.0,
+      "sum_cells_sq": 416806006.0,
+      "n_effective": 6534.02479483705
     },
     "6": {
       "status": "ok",
@@ -137,7 +161,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.436951940258344,
+      "sum_cells": 1655277.0,
+      "sum_cells_sq": 420844606.0,
+      "n_effective": 6510.578744899014
     },
     "7": {
       "status": "ok",
@@ -152,7 +180,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.4557072470585504,
+      "sum_cells": 1656877.0,
+      "sum_cells_sq": 418413261.0,
+      "n_effective": 6561.076450033929
     },
     "8": {
       "status": "ok",
@@ -167,7 +199,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.5280200392007828,
+      "sum_cells": 1652240.0,
+      "sum_cells_sq": 417283332.0,
+      "n_effective": 6542.070598688567
     },
     "9": {
       "status": "ok",
@@ -182,7 +218,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.4914932598670325,
+      "sum_cells": 1633310.0,
+      "sum_cells_sq": 408816598.0,
+      "n_effective": 6525.423794314731
     },
     "10": {
       "status": "ok",
@@ -197,7 +237,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.426025857528051,
+      "sum_cells": 1664971.0,
+      "sum_cells_sq": 426654480.0,
+      "n_effective": 6497.361590674027
     },
     "11": {
       "status": "ok",
@@ -212,7 +256,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.5067419707775116,
+      "sum_cells": 1626387.0,
+      "sum_cells_sq": 407895517.0,
+      "n_effective": 6484.833893795896
     },
     "12": {
       "status": "ok",
@@ -227,7 +275,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.469204848011335,
+      "sum_cells": 1601514.0,
+      "sum_cells_sq": 397526164.0,
+      "n_effective": 6452.020834019871
     },
     "13": {
       "status": "ok",
@@ -242,7 +294,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.461731478571892,
+      "sum_cells": 1634674.0,
+      "sum_cells_sq": 409947859.0,
+      "n_effective": 6518.29013766358
     },
     "14": {
       "status": "ok",
@@ -257,7 +313,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.5219925294319787,
+      "sum_cells": 1645754.0,
+      "sum_cells_sq": 411355505.0,
+      "n_effective": 6584.344187920859
     },
     "15": {
       "status": "ok",
@@ -272,7 +332,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.442800963918368,
+      "sum_cells": 1648666.0,
+      "sum_cells_sq": 414452279.0,
+      "n_effective": 6558.293239729054
     },
     "16": {
       "status": "ok",
@@ -287,7 +351,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.5344422409931817,
+      "sum_cells": 1620502.0,
+      "sum_cells_sq": 402133470.0,
+      "n_effective": 6530.236669939461
     },
     "17": {
       "status": "ok",
@@ -302,7 +370,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.524725536505381,
+      "sum_cells": 1642096.0,
+      "sum_cells_sq": 412181368.0,
+      "n_effective": 6541.972739573226
     },
     "18": {
       "status": "ok",
@@ -317,7 +389,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.433877239624659,
+      "sum_cells": 1639810.0,
+      "sum_cells_sq": 411149716.0,
+      "n_effective": 6540.140322266451
     },
     "19": {
       "status": "ok",
@@ -332,7 +408,11 @@
         "steps": 5000,
         "batch": 128,
         "model": "cnn"
-      }
+      },
+      "L0_unweighted": 2.4530293196439743,
+      "sum_cells": 1616129.0,
+      "sum_cells_sq": 396144063.0,
+      "n_effective": 6593.240158293121
     }
   },
   "aggregate": {
@@ -362,17 +442,48 @@
     "n_independent_audit_units": 12288,
     "independent_unit": "example (one padded 30x30 ARC-TGI grid); NOT the cell",
     "estimator": "content_cell_weighted_ratio",
-    "estimator_note": "L0 and LT are audit_panel_loss's floored_ce: total floored CE over every content cell of the panel divided by the total content-cell count. That is sum_i w_i m_i with w_i = c_i / sum_j c_j, not the unweighted mean of n per-example losses, and route (c)'s Delta is the radius of the unweighted mean. The corrected radius is Delta*sqrt(n/n_eff) with n_eff = (sum_i c_i)^2 / sum_i c_i^2 <= n, so Delta below is too small for this estimator whenever the grids differ in size, which they do.",
-    "n_effective": null,
-    "n_effective_note": "null: the archived measurement stored no per-example content-cell counts, so n_eff is not recoverable from this record. A re-run of c1_panelB_initial_loss.py stores sum_cells, sum_cells_sq and n_effective per seed, and L0_unweighted beside L0.",
-    "n_effective_required_for_positive_bound": 289,
-    "n_effective_required_note": "2*R^2*ln(2N/delta)/G^2 at the mean gain: the corrected lower bound stays positive for every n_eff above this, out of n = 12288 records. Since n_eff >= n*mean(c)/max(c) and max(c) <= 900 on a 30x30 canvas, a mean above 21.2 content cells per example is sufficient on its own. Neither quantity is settled by this record.",
-    "loss_range_R": 4.605170185988091,
     "delta": 0.05,
     "candidate_set_size_N": 1,
+    "loss_range_R": 4.605170185988091,
     "slack_route": "c",
-    "Delta": 0.05642055019495678,
-    "slack_Gamma": 0.11284110038991356,
+    "n_effective": 6521.7537414292365,
+    "n_effective_per_seed": {
+      "min": 6442.595430601851,
+      "max": 6593.240158293121,
+      "mean": 6521.7537414292365,
+      "sd": 42.56680501916588,
+      "values": {
+        "0": 6505.695674631296,
+        "1": 6568.683849640433,
+        "2": 6488.0023457384195,
+        "3": 6442.595430601851,
+        "4": 6456.189371323889,
+        "5": 6534.02479483705,
+        "6": 6510.578744899014,
+        "7": 6561.076450033929,
+        "8": 6542.070598688567,
+        "9": 6525.423794314731,
+        "10": 6497.361590674027,
+        "11": 6484.833893795896,
+        "12": 6452.020834019871,
+        "13": 6518.29013766358,
+        "14": 6584.344187920859,
+        "15": 6558.293239729054,
+        "16": 6530.236669939461,
+        "17": 6541.972739573226,
+        "18": 6540.140322266451,
+        "19": 6593.240158293121
+      }
+    },
+    "n_effective_definition": "(sum_i c_i)^2 / sum_i c_i^2 over the content-cell counts c_i of the panel's n records",
+    "priced_at": "n_effective: the headline Delta and slack are the single-panel values at the mean n_eff over seeds; per-seed bounds are priced at each seed's own n_eff",
+    "Delta": 0.07744541659654455,
+    "slack_Gamma": 0.1548908331930891,
+    "unweighted_reference": {
+      "Delta": 0.05642055019495678,
+      "slack_Gamma": 0.11284110038991356,
+      "note": "the radius of an unweighted mean of n records, for comparison only; it is not the radius of the archived estimator and prices nothing in this record"
+    },
     "L0": {
       "mean": 2.4841167166043077,
       "sd": 0.04105493623758308,
@@ -391,14 +502,53 @@
       "min": 0.6394695443378182,
       "max": 0.8109188451369267
     },
-    "lower_bound_on_improvement": 0.6237138061118271,
-    "discrimination_ratio": 6.527363734992242,
-    "bound_reading": "the lower bound and the ratio above are the published route (c) arithmetic and are exact for an unweighted mean of n per-example losses. The archived level is the cell-weighted ratio, so under that estimator the supported statement is conditional: the bound is positive exactly while n_eff > 289.",
+    "L0_unweighted": {
+      "mean": 2.4844478170077,
+      "sd": 0.03835533918652403,
+      "min": 2.426025857528051,
+      "max": 2.5615075627962747,
+      "note": "unweighted mean of per-record means at theta_0, for reference; no unweighted terminal level exists in the C1 shards, so no unweighted gain or bound is formed"
+    },
+    "lower_bound_on_improvement": 0.5816640733086516,
+    "discrimination_ratio": 4.755316317419127,
+    "bound_reading": "mean gain over seeds less the single-panel slack at the mean n_eff; positive, so the run has improved on the sealed panel by at least this much at confidence 1 - delta",
+    "n_effective_required_for_positive_bound": 289,
+    "n_effective_required_note": "the headline bound is positive for every n_eff above this; the measured n_eff is 6521.8, 23 times the threshold",
+    "per_seed_slack": {
+      "min": 0.1540488520478591,
+      "max": 0.1558394776432586
+    },
     "per_seed_lower_bound": {
-      "min": 0.5266284439479046,
-      "max": 0.6980777447470131,
+      "min": 0.48444583797929974,
+      "max": 0.6561286480244536,
       "positive_count": 20,
-      "note": "each seed draws its own independent panel B, so this is the single-seed statement at delta=0.05 applied seed by seed; it is not a simultaneous 95% statement across all 20 seeds, which would need a union bound over seeds"
+      "values": {
+        "0": 0.5415139920476185,
+        "1": 0.6485450084891884,
+        "2": 0.5200573187668646,
+        "3": 0.6066798533198177,
+        "4": 0.6269509168471157,
+        "5": 0.5610121261953283,
+        "6": 0.48444583797929974,
+        "7": 0.5739357501535667,
+        "8": 0.6294850262315057,
+        "9": 0.5861042888391593,
+        "10": 0.5132502150605773,
+        "11": 0.6009325413548277,
+        "12": 0.5637573814831138,
+        "13": 0.5540878773162697,
+        "14": 0.6126331507682897,
+        "15": 0.5934191152071117,
+        "16": 0.6561286480244536,
+        "17": 0.6376570072399451,
+        "18": 0.5701835872661436,
+        "19": 0.5524547409710041
+      },
+      "note": "each seed draws its own independent panel B and is priced at its own n_eff; this is the single-seed statement at delta=0.05 applied seed by seed, not a simultaneous 95% statement across all 20 seeds"
+    },
+    "per_seed_discrimination_ratio": {
+      "min": 4.124979071645577,
+      "max": 5.238825586272106
     }
   }
 }

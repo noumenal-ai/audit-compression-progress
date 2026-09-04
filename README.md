@@ -90,6 +90,22 @@ python3 mmluprox_battery.py        # language battery and its separation profile
 python3 cp_experiments.py --help   # the curriculum reward ablation
 ```
 
+The curriculum ablation and the ARC-TGI panel regenerator draw their tasks from the
+`simon-arc-lab` generators, which are not vendored. Clone that repository at the pinned
+commit and point the scripts at it:
+
+```sh
+git clone https://github.com/neoneye/simon-arc-lab data/arc-tgi
+git -C data/arc-tgi checkout d8a2621
+export ARC_TGI_ROOT="$PWD/data/arc-tgi"
+```
+
+The ARC-TGI worked example is priced at the effective sample size of its cell-weighted
+loss, which the archived record carries per seed. `experiments/c1_panelB_initial_loss.py
+--force` regenerates every seed's panel from its seed and re-measures those counts; the
+regenerated panel reproduces the archived initial level exactly, which is the check that
+the counts belong to the panel the archived terminal levels were scored on.
+
 The world-model audit scores seven predeclared candidates on DINO-WM features over DROID
 robot data, at a loss range of one. The per-endpoint radius is 0.007434 and the
 two-endpoint slack is 1.49% of the range. The identity candidate is best at both ends, so
