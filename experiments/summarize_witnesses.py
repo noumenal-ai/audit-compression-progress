@@ -15,11 +15,14 @@ Records read (20 seeds each unless noted):
   e7_multiseed_summary.json     holdout attack, 20-seed aggregate written by e7_multiseed.py
   e7cal_seed0.json, e7scal_seed0.json
                                 holdout attack, the seed-0 records the aggregate reproduces
+  e7_regenerated/e7cal_seed<S>.json, e7_regenerated/e7scal_seed<S>.json
+                                holdout attack, seeds 1 to 19 regenerated from this code
   c1_panelB_initial_loss.json   initial and terminal sealed-panel levels of the ablation run
 
-The holdout-attack aggregate is read as archived: e7_multiseed.py writes only the aggregate,
-so per-seed records exist for seed 0 alone. The script checks that the aggregate's seed-0
-entry equals the archived seed-0 record.
+The holdout-attack values are read from the archived aggregate: e7_multiseed.py writes only the
+aggregate, so the original run archived per-seed records for seed 0 alone. The script checks that
+the aggregate's seed-0 entry equals the archived seed-0 record, and that the archived seed 0
+together with the regenerated seeds 1 to 19 reproduces every value of the aggregate.
 
 Usage:
     python3 summarize_witnesses.py               # read ./results_data
@@ -346,6 +349,53 @@ def holdout_attack(data: Path, L: Ledger, extra: bool) -> None:
         L.exact("panel-size sweep: seeds crossing at n = 50", scal[50]["crosses"], 20)
 
 
+def holdout_attack_regenerated(data: Path, L: Ledger) -> None:
+    """Archived seed 0 plus regenerated seeds 1..19 must reproduce the archived aggregate."""
+    regen = data / "e7_regenerated"
+    summ = read_json(data / "e7_multiseed_summary.json")
+    cal = [read_json(data / "e7cal_seed0.json")["e7cal"]] + [
+        read_json(regen / f"e7cal_seed{s}.json")["e7cal"] for s in SEEDS[1:]]
+    scal = [read_json(data / "e7scal_seed0.json")["e7scal"]] + [
+        read_json(regen / f"e7scal_seed{s}.json")["e7scal"] for s in SEEDS[1:]]
+
+    def agg(gaps: Sequence[float]):
+        m, s = statistics.fmean(gaps), statistics.stdev(gaps)
+        return m, s, 1.96 * s / math.sqrt(len(gaps)), min(gaps), max(gaps)
+
+    worst, counts_ok = 0.0, True
+    for qi, row in enumerate(summ["calibration_naive"]):
+        rows = [r["naive_sweep"][qi] for r in cal]
+        m, s, h, lo, hi = agg([r["gap"] for r in rows])
+        thr = statistics.fmean(r["threshold_2delta"] for r in rows)
+        for x, y in ((m, row["gap_mean"]), (s, row["gap_sd"]), (h, row["gap_ci95"]),
+                     (lo, row["gap_min"]), (hi, row["gap_max"]), (thr, row["threshold"])):
+            worst = max(worst, abs(x - y))
+        counts_ok &= all(r["Q"] == row["Q"] for r in rows)
+        counts_ok &= sum(bool(r["attacker_wins"]) for r in rows) == row["wins"]
+    for di, row in enumerate(summ["calibration_defenses_maxQ"]):
+        rows = [r["defenses_at_maxQ"][di] for r in cal]
+        m, s, h, _, _ = agg([r["gap"] for r in rows])
+        thr = statistics.fmean(r["threshold_2delta"] for r in rows)
+        for x, y in ((m, row["gap_mean"]), (s, row["gap_sd"]), (h, row["gap_ci95"]),
+                     (thr, row["threshold"])):
+            worst = max(worst, abs(x - y))
+        counts_ok &= all(r["defense"] == row["defense"] for r in rows)
+        counts_ok &= sum(bool(r["attacker_wins"]) for r in rows) == row["wins"]
+    for ni, row in enumerate(summ["scaling_curve"]):
+        rows = [r["by_n"][ni] for r in scal]
+        m, s, h, _, _ = agg([r["gap"] for r in rows])
+        thr = statistics.fmean(r["threshold_2delta"] for r in rows)
+        for x, y in ((m, row["gap_mean"]), (s, row["gap_sd"]), (h, row["gap_ci95"]),
+                     (thr, row["threshold"])):
+            worst = max(worst, abs(x - y))
+        counts_ok &= all(r["n"] == row["n"] for r in rows)
+        counts_ok &= sum(bool(r["crosses"]) for r in rows) == row["crosses"]
+    section("Holdout attack: archived seed 0 with regenerated seeds 1 to 19 (e7_regenerated/)")
+    L.exact("Q, defense, n and win or cross counts equal the aggregate's", counts_ok, True)
+    L.below("largest difference from the aggregate's means, SDs, half-widths, extremes, thresholds",
+            worst, 1e-9)
+
+
 def sealed_panel_report(data: Path, L: Ledger, extra: bool,
                         terminal: Dict[str, List[float]]) -> None:
     rec = read_json(data / "c1_panelB_initial_loss.json")
@@ -403,6 +453,8 @@ def main(argv: Sequence[str] = None) -> int:
             concentration(args.data, L, extra)
             calibration(args.data, L, extra)
             holdout_attack(args.data, L, extra)
+            if not extra:
+                holdout_attack_regenerated(args.data, L)
             sealed_panel_report(args.data, L, extra, terminal)
     except (RecordError, KeyError, IndexError, TypeError) as exc:
         print(f"\nERROR: {type(exc).__name__}: {exc}", file=sys.stderr)

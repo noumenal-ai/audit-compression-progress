@@ -1,0 +1,59 @@
+{
+  "e7scal": {
+    "experiment": "E7_scaling_curve (panel size n vs budget Q)",
+    "C": 10,
+    "Q": 8000,
+    "cells": 1,
+    "by_n": [
+      {
+        "n": 50,
+        "g_a": 1,
+        "dim": 500,
+        "Q_over_2dim": 8.0,
+        "gap": 4.4209258104178915,
+        "threshold_2delta": 3.2792176517056166,
+        "crosses": true
+      },
+      {
+        "n": 200,
+        "g_a": 1,
+        "dim": 2000,
+        "Q_over_2dim": 2.0,
+        "gap": 3.275900055260006,
+        "threshold_2delta": 1.6396088258528083,
+        "crosses": true
+      },
+      {
+        "n": 800,
+        "g_a": 1,
+        "dim": 8000,
+        "Q_over_2dim": 0.5,
+        "gap": 0.9300000000000002,
+        "threshold_2delta": 0.8419160324902277,
+        "crosses": true
+      },
+      {
+        "n": 3200,
+        "g_a": 1,
+        "dim": 32000,
+        "Q_over_2dim": 0.125,
+        "gap": 0.21812500000000012,
+        "threshold_2delta": 0.4422449887511362,
+        "crosses": false
+      },
+      {
+        "n": 12800,
+        "g_a": 1,
+        "dim": 128000,
+        "Q_over_2dim": 0.031,
+        "gap": 0.05749999999999966,
+        "threshold_2delta": 0.23127667884482192,
+        "crosses": false
+      }
+    ],
+    "crosses_at_small_n": true,
+    "max_n_crossed": 800,
+    "gap_decreases_with_n": true,
+    "_wallclock_sec": 18.49
+  }
+}

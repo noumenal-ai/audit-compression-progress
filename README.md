@@ -119,13 +119,15 @@ fitted temperature, the Welch statistic and the effective panel size).
 | Training on the reusable panel | At 24 families: apparent progress 2.386, true progress -1.497, false-positive excess 3.883 (0.202). At 144 families: excess 3.527. | `e4a_seed<S>.json` |
 | Uniform deviation against panel size | Log-log slope -0.526 (0.047) over panel sizes 16, 64 and 256. | `e5_seed<S>.json` |
 | Calibration probe | Accuracy change exactly 0 in 20 of 20 seeds. | `e6_seed<S>.json` |
-| Holdout attack | Naive release at `Q = 8000`, `n = 200`: gap 3.241 (0.070) against the threshold 1.6396, attacker wins 20 of 20. Fresh subsample 1.368; ladder, rounded and one-shot 0.000. Panel-size sweep at `n` = 50, 200, 800, 3200, 12800: gap 4.181, 3.242, 0.906, 0.226, 0.0564 against thresholds 3.279, 1.640, 0.842, 0.442, 0.231. | `e7_multiseed_summary.json`, `e7cal_seed0.json`, `e7scal_seed0.json` |
+| Holdout attack | Naive release at `Q = 8000`, `n = 200`: gap 3.241 (0.070) against the threshold 1.6396, attacker wins 20 of 20. Fresh subsample 1.368; ladder, rounded and one-shot 0.000. Panel-size sweep at `n` = 50, 200, 800, 3200, 12800: gap 4.181, 3.242, 0.906, 0.226, 0.0564 against thresholds 3.279, 1.640, 0.842, 0.442, 0.231. | `e7_multiseed_summary.json`, `e7cal_seed0.json`, `e7scal_seed0.json`; regenerated seeds 1 to 19 in `e7_regenerated/` |
 | Five-number report of the audit-CP run on the sealed panel | Mean gain 0.7366 (0.0468), slack 0.1549, lower bound on improvement 0.5817, discrimination ratio 4.76. | `c1_panelB_initial_loss.json`, `c1_seed<S>.json` |
 
 The holdout-attack values come from the 20-seed summary written by `e7_multiseed.py`, which stores
-the aggregate and not the per-seed results; the per-seed records are archived for seed 0. The
-attack is pure NumPy and determined by its seed, and `python3 experiments/e7_multiseed.py 20`
-regenerates the summary byte for byte.
+the aggregate and not the per-seed results; the original run archived per-seed records for seed 0.
+The attack is pure NumPy and determined by its seed. `results_data/e7_regenerated/` holds seeds 1
+to 19 regenerated from this code; with the archived seed 0 they reproduce every value of the
+summary, which `summarize_witnesses.py` checks. They are labelled as regenerated, and the reported
+numbers are read from the archived summary.
 
 ### Figures
 

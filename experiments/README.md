@@ -26,6 +26,7 @@ precision, and exits nonzero on any mismatch. It needs only the Python 3 standar
 | `e6_seed<S>.json` | Temperature calibration of a trained predictor |
 | `e7_multiseed_summary.json` | Holdout attack over 20 seeds: calibration at `Q = 8000`, `n = 200`, the release mechanisms, and the panel-size sweep |
 | `e7cal_seed0.json`, `e7scal_seed0.json` | The seed-0 calibration and sweep records; the summary's seed-0 entry equals them |
+| `e7_regenerated/` | Seeds 1 to 19 of the calibration and sweep, regenerated from this code; with seed 0 they reproduce every value of the summary (see its README) |
 | `c1_panelB_initial_loss.json` | Initial and terminal levels of the audit-CP run on the sealed panel, per seed, with the effective panel size and the five-number report |
 
 Seeds `S` run from 0 to 19. Each per-seed file holds the driver's result under a top-level key
