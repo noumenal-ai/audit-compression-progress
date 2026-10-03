@@ -1,0 +1,25 @@
+{
+  "e5": {
+    "experiment": "E5_uniform_deviation",
+    "by_n": [
+      {
+        "n": 16,
+        "delta_n_median": 0.19626246164133954,
+        "delta_n_p90": 0.25063966700463364
+      },
+      {
+        "n": 64,
+        "delta_n_median": 0.08750710261620576,
+        "delta_n_p90": 0.10558496045464309
+      },
+      {
+        "n": 256,
+        "delta_n_median": 0.03942736785357015,
+        "delta_n_p90": 0.0470294042462938
+      }
+    ],
+    "loglog_slope": -0.5788787314796896,
+    "expected_slope": -0.5,
+    "_wallclock_sec": 3973.22
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "c1": {
+    "experiment": "C1_curriculum_reward_ablation",
+    "by_policy": {
+      "audit_cp": {
+        "final_fresh_floored_ce": 1.7451839693622893,
+        "final_active_cell_acc": 0.3971599641170785,
+        "final_exact_grid_acc": 0.028645833333333332,
+        "distractor_fraction": 0.2288,
+        "cumulative_audit_cp": 0.7227479519889144
+      },
+      "prediction_error": {
+        "final_fresh_floored_ce": 1.7732374622349538,
+        "final_active_cell_acc": 0.3609126501206528,
+        "final_exact_grid_acc": 0.017333984375,
+        "distractor_fraction": 0.5606,
+        "cumulative_audit_cp": null
+      },
+      "rnd": {
+        "final_fresh_floored_ce": 1.717704045688247,
+        "final_active_cell_acc": 0.3824131960139359,
+        "final_exact_grid_acc": 0.025553385416666668,
+        "distractor_fraction": 0.2528,
+        "cumulative_audit_cp": null
+      },
+      "icm": {
+        "final_fresh_floored_ce": 1.8724728218690398,
+        "final_active_cell_acc": 0.3207077836732707,
+        "final_exact_grid_acc": 0.014567057291666666,
+        "distractor_fraction": 0.1348,
+        "cumulative_audit_cp": null
+      },
+      "uniform": {
+        "final_fresh_floored_ce": 1.7452011070001696,
+        "final_active_cell_acc": 0.38690273363884814,
+        "final_exact_grid_acc": 0.027425130208333332,
+        "distractor_fraction": 0.247,
+        "cumulative_audit_cp": null
+      },
+      "round_robin": {
+        "final_fresh_floored_ce": 1.7506429011000246,
+        "final_active_cell_acc": 0.3773826329441381,
+        "final_exact_grid_acc": 0.024820963541666668,
+        "distractor_fraction": 0.2496,
+        "cumulative_audit_cp": null
+      },
+      "oracle_learnable": {
+        "final_fresh_floored_ce": 1.6881780975164848,
+        "final_active_cell_acc": 0.3978560649786858,
+        "final_exact_grid_acc": 0.034016927083333336,
+        "distractor_fraction": 0.0,
+        "cumulative_audit_cp": null
+      }
+    },
+    "audit_cp_minus_curiosity_active_acc": {
+      "prediction_error": 0.03624731399642567,
+      "rnd": 0.014746768103142571,
+      "icm": 0.0764521804438078
+    },
+    "_wallclock_sec": 21748.4
+  }
+}
