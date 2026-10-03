@@ -32,8 +32,8 @@ The obstruction is on the measurement, not on the learner.
 `AuditCP.condEntropy_le_condCrossEntropy` constrains the candidate type not at all, so the *true*
 compression progress of the entire run is budgeted by a constant fixed at initialisation, with no
 class, no concentration and no horizon term.  What a learner can do is not mine unbounded genuine
-progress; it is run a trajectory whose measured progress admits no certificate at the resolution of
-the trajectory.
+progress; it is run a trajectory whose measured progress admits no positive lower bound on improvement at the
+resolution of the trajectory.
 
 The repair changes what is reported, not how it is bounded: audit two **declared checkpoints**
 instead of the path.  The audited class then has two elements, and
