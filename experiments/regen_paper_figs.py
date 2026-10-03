@@ -43,7 +43,7 @@ sm = [np.mean(byk[k]["s"]) for k in ks]; am = [np.mean(byk[k]["a"]) for k in ks]
 e1ax.bar(x - w/2, sm, w, color=RED, label="stream-scored CP")
 e1ax.bar(x + w/2, am, w, color=BLUE, label="sealed-audit CP")
 e1ax.set_xticks(x); e1ax.set_xticklabels([f"{k:g}" for k in ks]); e1ax.set_xlabel("stream bias $k$")
-e1ax.set_ylabel("cumulative CP"); e1ax.set_title("E1: stream scoring overstates progress", fontsize=9)
+e1ax.set_ylabel("cumulative CP"); e1ax.set_title("Stream scoring overstates progress", fontsize=9)
 e1ax.set_ylim(top=max(sm) * 1.30); e1ax.legend(fontsize=7.2, loc="upper right", framealpha=0.9)
 
 # E3: clipping farms reward
@@ -53,7 +53,7 @@ gap = np.mean([r["exploit_gap"] for r in e3])
 e3ax.bar([0, 1], [cs, cc], color=[BLUE, RED], width=0.6)
 e3ax.axhline(0, color="k", lw=0.6)
 e3ax.set_xticks([0, 1]); e3ax.set_xticklabels(["signed\nCP", "clipped\nCP"])
-e3ax.set_ylabel("cumulative reward"); e3ax.set_title("E3: clipping farms reward", fontsize=9)
+e3ax.set_ylabel("cumulative reward"); e3ax.set_title("Clipping farms reward", fontsize=9)
 e3ax.set_ylim(min(cs * 1.6, -0.1), cc * 1.25)
 e3ax.annotate(f"$+{gap:.2f}$ gap", xy=(0.5, cc), ha="center", va="bottom", fontsize=8)
 
@@ -68,7 +68,7 @@ e4ax.bar(x4 - w/2, em, w, color=RED, label="reusable panel CP")
 e4ax.bar(x4 + w/2, tm, w, color=BLUE, label="fresh-audit CP")
 e4ax.axhline(0, color="k", lw=0.6)
 e4ax.set_xticks(x4); e4ax.set_xticklabels([str(n) for n in nns]); e4ax.set_xlabel("panel size $n$")
-e4ax.set_ylabel("cumulative CP"); e4ax.set_title("E4a: memorization reverses the sign", fontsize=9)
+e4ax.set_ylabel("cumulative CP"); e4ax.set_title("Memorization reverses the sign", fontsize=9)
 e4ax.set_ylim(min(tm) * 1.30, max(em) * 1.75)   # headroom so the legend clears the bars
 e4ax.legend(fontsize=7.2, loc="upper center", ncol=2, framealpha=0.9)
 
@@ -86,7 +86,7 @@ e6r = e6ax.twinx(); e6r.spines["top"].set_visible(False)
 e6r.bar(2 - wj/2, acc0, wj, color=GRAY); e6r.bar(2 + wj/2, acc1, wj, color=GREEN)
 e6r.set_ylim(0, 1.0); e6r.set_ylabel("accuracy")
 e6ax.set_xticks([0, 1, 2]); e6ax.set_xticklabels(["NLL", "ECE", "Accuracy"])
-e6ax.set_title("E6: calibration without discrimination change", fontsize=9)
+e6ax.set_title("Calibration without discrimination change", fontsize=9)
 e6ax.legend(fontsize=7.0, loc="upper left", framealpha=0.9)
 e6ax.annotate(f"$\\Delta$NLL$={nll1-nll0:+.4f}$\n$\\Delta$ECE$={ece1-ece0:+.4f}$\n$\\Delta$acc$={acc1-acc0:+.4f}$",
               xy=(0.37, 0.56), xycoords="axes fraction", fontsize=6.4, va="center")
@@ -95,6 +95,33 @@ fig.suptitle("Boundary witnesses: each broken proxy violates a different assumpt
 fig.tight_layout()
 bpath = os.path.join(OUTDIR, "fig_boundary_witnesses.pdf"); fig.savefig(bpath); plt.close(fig)
 print("wrote", bpath)
+
+# =================== fig_c1_policy_bars (reward-signal ablation, dual axis; de-coded title) ===================
+c1 = load("c1")
+cpols = ["audit_cp", "prediction_error", "rnd", "icm", "uniform", "oracle_learnable"]
+clabels = ["audit-CP", "pred-err", "RND", "ICM", "uniform", "oracle"]
+cacc = {p: [] for p in cpols}; cdfr = {p: [] for p in cpols}
+for r in c1:
+    bp = r["by_policy"]
+    for p in cpols:
+        if p in bp:
+            cacc[p].append(bp[p]["final_active_cell_acc"]); cdfr[p].append(bp[p]["distractor_fraction"])
+cam = [np.mean(cacc[p]) for p in cpols]; casd = [np.std(cacc[p]) for p in cpols]
+cdm = [np.mean(cdfr[p]) for p in cpols]
+xc = np.arange(len(cpols)); wc = 0.38
+fc, axL = plt.subplots(figsize=(7.0, 3.0))
+bA = axL.bar(xc - wc / 2, cam, wc, yerr=casd, capsize=2, color=BLUE, label="active-cell accuracy")
+axL.set_ylabel("final active-cell accuracy")
+axL.set_ylim(0.30, max(c + s for c, s in zip(cam, casd)) + 0.015)
+axR = axL.twinx(); axR.spines["top"].set_visible(False)
+bD = axR.bar(xc + wc / 2, cdm, wc, color="#e08e0b", label="distractor fraction")
+axR.set_ylabel("distractor allocation fraction"); axR.set_ylim(0, 0.55)
+axL.set_xticks(xc); axL.set_xticklabels(clabels, rotation=25, ha="right")
+axL.set_title("Reward-signal ablation under a fixed scheduler", fontsize=10)
+axL.legend(handles=[bA, bD], loc="upper center", bbox_to_anchor=(0.5, -0.26), ncol=2, fontsize=8, frameon=False)
+fc.tight_layout()
+cpath = os.path.join(OUTDIR, "fig_c1_policy_bars.pdf"); fc.savefig(cpath); plt.close(fc)
+print("wrote", cpath)
 
 # =================== fig_e5 (legend at 3 decimals -> -0.527) ===================
 e5 = load("e5"); byn5 = defaultdict(list)

@@ -83,6 +83,6 @@ out = {"nseeds": NSEEDS, "seeds": SEEDS,
        "seed0_faithful": bool(ok), "seed0_gap_Q8000": float(s0["gap"]),
        "calibration_naive": naive_out, "calibration_defenses_maxQ": def_out,
        "scaling_curve": scal_out}
-dst = Path(__file__).resolve().parent / "camera_ready_results" / "e7_multiseed_summary.json"
+dst = Path(__file__).resolve().parent / "results_data" / "e7_multiseed_summary.json"
 dst.write_text(json.dumps(out, indent=2))
 print(f"\nwrote {dst}")
