@@ -1,6 +1,7 @@
 import AuditCP.Base
 import AuditCP.Basic
 import AuditCP.Telescope
+import AuditCP.CyberneticCocycle
 import AuditCP.FiniteAudit
 import AuditCP.FiniteExperts
 import AuditCP.StructuralAudit
@@ -63,6 +64,7 @@ the closure is a refinement of one.
 | 0 | `Vendored.FinitePMF`, `Base` | the base types; nothing is proved |
 | 1 | `Basic` | the audited objects: the ledger, the deviation ball, admissibility |
 | 2 | `Telescope` | the ledger is exact; a closed path nets zero |
+| 2½ | `CyberneticCocycle` | an independently given change law composes exactly iff it is a potential difference; clipping breaks closed-loop cancellation |
 | 3 | `FiniteAudit` | the slack: `2Δ`, uniformly in the horizon and the policy |
 | 4 | `FiniteExperts` | the slack gets a number, and B7 enters |
 | 5 | `StructuralAudit` | the envelope may be random and the audit may not see it |
