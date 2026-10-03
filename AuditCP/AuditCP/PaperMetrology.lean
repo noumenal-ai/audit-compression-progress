@@ -23,6 +23,13 @@ a numerical side condition; whether an actual experiment meets it is not a theor
 
 `deltaFiniteExperts` and `finite_audit_goodhart` are the native formal sources for the finite-panel
 radius and the signed endpoint guarantee.
+
+*The printed interval.*  `auditBlind_pairwise_evidenceInterval` is the statement a finite-panel
+report instantiates.  One uniform-deviation event over the declared finite class, on a panel drawn
+independently of training, gives every ordered pair of the class both the lower bound
+`evidenceLowerBound` and the matching upper end at the same slack `2Δ`, simultaneously.  The losses
+may depend arbitrarily on the training outcome; joint measurability in that outcome and the audit
+unit is the premise that makes the failure event an event.
 -/
 
 namespace AuditCP
@@ -259,5 +266,95 @@ theorem weightedBattery_bound
       exact mul_le_mul_of_nonneg_left (hcomponent j) (hweight j)
     _ = (∑ j, weight j * truth j) + ∑ j, weight j * slack j := by
       simp only [mul_add, Finset.sum_add_distrib]
+
+/-! ## The printed interval -/
+
+section PrintedInterval
+
+open MeasureTheory ProbabilityTheory
+
+/-- If `loss t i z` is the loss of candidate `i` of a finite nonempty class `ι` on audit unit `z`
+after training outcome `t`, jointly measurable in `(t, z)` for each `i` and a.e. valued in `[a, b]`
+under `Q` for each `t` and `i`, then under the audit-blind law
+`μtrain.prod (Measure.pi (fun _ : Fin n => Q))` the event that some ordered pair `(i, j)` fails
+`evidenceLowerBound Ĝ (2Δ) ≤ G ∧ G ≤ Ĝ + 2Δ` has probability at most `ENNReal.ofReal δ`, where
+`Ĝ = empiricalLoss (loss t) i panel - empiricalLoss (loss t) j panel`,
+`G = populationLoss Q (loss t) i - populationLoss Q (loss t) j`, and
+`Δ = deltaFiniteExperts (Fintype.card ι) n (b - a) δ` (hoeffding1963). -/
+theorem auditBlind_pairwise_evidenceInterval
+    {Ωtrain Z ι : Type*} [MeasurableSpace Ωtrain] [MeasurableSpace Z] [Fintype ι] [Nonempty ι]
+    (μtrain : AuditSampleLaw Ωtrain) [IsProbabilityMeasure μtrain]
+    (Q : AuditSampleLaw Z) [IsProbabilityMeasure Q]
+    (n : ℕ) (hn : 0 < n) (a b : ℝ) (hab : a < b) (δ : ℝ) (hδ0 : 0 < δ) (hδ1 : δ ≤ 1)
+    (loss : Ωtrain → ι → Z → ℝ)
+    (hmeas : ∀ i, Measurable fun q : Ωtrain × Z => loss q.1 i q.2)
+    (hbdd : ∀ t i, ∀ᵐ z ∂Q, loss t i z ∈ Set.Icc a b) :
+    (μtrain.prod (Measure.pi (fun _ : Fin n => Q)))
+        {p : Ωtrain × (Fin n → Z) | ∃ i j,
+          ¬ (evidenceLowerBound
+                (empiricalLoss (loss p.1) i p.2 - empiricalLoss (loss p.1) j p.2)
+                (2 * deltaFiniteExperts (Fintype.card ι) n (b - a) δ)
+              ≤ populationLoss Q (loss p.1) i - populationLoss Q (loss p.1) j ∧
+            populationLoss Q (loss p.1) i - populationLoss Q (loss p.1) j
+              ≤ empiricalLoss (loss p.1) i p.2 - empiricalLoss (loss p.1) j p.2
+                + 2 * deltaFiniteExperts (Fintype.card ι) n (b - a) δ)}
+      ≤ ENNReal.ofReal δ := by
+  classical
+  set Δ := deltaFiniteExperts (Fintype.card ι) n (b - a) δ
+  -- The measured and population potentials read off one training outcome.
+  let Ehat : Ωtrain → (Fin n → Z) → AuditPotential ι :=
+    fun t panel i => empiricalLoss (loss t) i panel
+  let Etrue : Ωtrain → AuditPotential ι := fun t i => populationLoss Q (loss t) i
+  -- The uniform-deviation failure event is jointly measurable.
+  have hEhat : ∀ i, Measurable fun p : Ωtrain × (Fin n → Z) => Ehat p.1 p.2 i := by
+    intro i
+    simp only [Ehat, empiricalLoss]
+    exact (Finset.measurable_sum Finset.univ fun j _ =>
+      (hmeas i).comp (measurable_fst.prodMk
+        ((measurable_pi_apply j).comp measurable_snd))).div_const _
+  have hE : ∀ i, Measurable fun t => Etrue t i := by
+    intro i
+    have h := ((hmeas i).stronglyMeasurable).integral_kernel_prod_right'
+      (κ := Kernel.const Ωtrain Q)
+    simp only [Kernel.const_apply] at h
+    simpa only [Etrue, populationLoss] using h.measurable
+  have hBad : MeasurableSet
+      {p : Ωtrain × (Fin n → Z) | ¬ UniformDev Set.univ (Ehat p.1 p.2) (Etrue p.1) Δ} :=
+    measurableSet_countable_uniformDev_failure (fun _ => Set.univ) (fun _ => by simp)
+      Ehat hEhat Etrue hE Δ
+  -- On the uniform-deviation event, every ordered pair satisfies both printed bounds: the lower
+  -- bound is Chapter 12's reading of the endpoint theorem, and the upper end is the same theorem
+  -- with the measured and population potentials exchanged, which `UniformDev` permits.
+  have hsub :
+      {p : Ωtrain × (Fin n → Z) | ∃ i j,
+          ¬ (evidenceLowerBound
+                (empiricalLoss (loss p.1) i p.2 - empiricalLoss (loss p.1) j p.2) (2 * Δ)
+              ≤ populationLoss Q (loss p.1) i - populationLoss Q (loss p.1) j ∧
+            populationLoss Q (loss p.1) i - populationLoss Q (loss p.1) j
+              ≤ empiricalLoss (loss p.1) i p.2 - empiricalLoss (loss p.1) j p.2 + 2 * Δ)}
+        ⊆ {p | ¬ UniformDev Set.univ (Ehat p.1 p.2) (Etrue p.1) Δ} := by
+    rintro p ⟨i, j, hij⟩ hUD
+    have hadm : Admissible (endpointPairPath (i, j)) Set.univ := fun _ => Set.mem_univ _
+    have hlow := goodhart_evidenceLowerBound hUD hadm 1
+    have hUD' : UniformDev Set.univ (Etrue p.1) (Ehat p.1 p.2) Δ := fun θ hθ => by
+      rw [abs_sub_comm]; exact hUD θ hθ
+    have hup := finite_audit_goodhart hUD' hadm 1
+    rw [cumCP_endpointPairPath, cumCP_endpointPairPath] at hlow hup
+    exact hij ⟨hlow, hup⟩
+  -- Over every training outcome the fiber is the finite-experts failure event.
+  calc
+    _ ≤ (μtrain.prod (Measure.pi (fun _ : Fin n => Q)))
+          {p | ¬ UniformDev Set.univ (Ehat p.1 p.2) (Etrue p.1) Δ} := measure_mono hsub
+    _ = ∫⁻ t, (Measure.pi (fun _ : Fin n => Q))
+          (Prod.mk t ⁻¹' {p | ¬ UniformDev Set.univ (Ehat p.1 p.2) (Etrue p.1) Δ}) ∂μtrain :=
+        Measure.prod_apply hBad
+    _ ≤ ∫⁻ _t, ENNReal.ofReal δ ∂μtrain := by
+        refine lintegral_mono fun t => ?_
+        exact finite_experts_iid_badEvent_le Q n hn a b hab δ hδ0 hδ1 (loss t)
+          (fun i => (hmeas i).comp (measurable_const.prodMk measurable_id)) (hbdd t)
+    _ = ENNReal.ofReal δ := by
+        simp [MeasureTheory.lintegral_const, IsProbabilityMeasure.measure_univ]
+
+end PrintedInterval
 
 end AuditCP

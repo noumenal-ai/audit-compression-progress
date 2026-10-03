@@ -1,0 +1,38 @@
+{
+  "e3": {
+    "experiment": "E3_signed_vs_clipped",
+    "E0": 2.4432914194229864,
+    "E_T": 2.440836455940777,
+    "endpoint_improvement": 0.0024549634822093047,
+    "cum_signed": 0.0024549634822093047,
+    "cum_clipped": 1.6749343091073907,
+    "exploit_gap": 1.6724793456251814,
+    "trajectory": [
+      {
+        "cycle": 0,
+        "cum_signed": 0.03458132797937541,
+        "cum_clipped": 0.6993823017351604,
+        "union_loss": 2.408710091443611
+      },
+      {
+        "cycle": 1,
+        "cum_signed": -0.17201900728867558,
+        "cum_clipped": 0.9147067762105396,
+        "union_loss": 2.615310426711662
+      },
+      {
+        "cycle": 2,
+        "cum_signed": -0.731607146436124,
+        "cum_clipped": 0.9408721991890574,
+        "union_loss": 3.1748985658591105
+      },
+      {
+        "cycle": 3,
+        "cum_signed": 0.0024549634822093047,
+        "cum_clipped": 1.6749343091073907,
+        "union_loss": 2.440836455940777
+      }
+    ],
+    "_wallclock_sec": 7909.58
+  }
+}

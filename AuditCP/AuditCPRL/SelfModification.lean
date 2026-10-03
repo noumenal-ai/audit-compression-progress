@@ -26,7 +26,7 @@ Three properties are the content.
   containment and the iterates may leave the ball in between.  The invariant ball is needed only
   for validity at every horizon at once.
 * **No regularity on the self-modification.**  `AuditCP.kernel_adaptiveTrajectory_goodhart` reaches
-  the certificate event by `measure_mono`, so the map from audit outcome to rewritten dynamics needs
+  the bound's event by `measure_mono`, so the map from audit outcome to rewritten dynamics needs
   no measurability, adaptedness or integrability.  Every RLTheory convergence route assumes
   measurability of the update.
 * **No horizon factor, no behaviour-policy term, no schedule term** in the penalty.

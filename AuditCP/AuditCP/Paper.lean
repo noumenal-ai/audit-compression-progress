@@ -1,6 +1,7 @@
 import AuditCP.Base
 import AuditCP.Basic
 import AuditCP.Telescope
+import AuditCP.CyberneticCocycle
 import AuditCP.FiniteAudit
 import AuditCP.FiniteExperts
 import AuditCP.StructuralAudit
@@ -29,8 +30,9 @@ import AuditCPRL.Milestone
 /-!
 # Audit-CP — the thesis
 
-This root is the thesis, in order.  The import list above is the argument, and every module below
-imports exactly its predecessor, so the chain is the proof and not a bibliography.
+This root is the thesis, in order.  The import list above is the argument.  Chapters 0 to 12 form
+one chain in which each module imports its predecessor (chapter 2½ branches from chapter 2), and
+chapters 13 to 25 import the chapters they use together with `RLTheory`.
 
 ## The claim
 
@@ -63,6 +65,7 @@ the closure is a refinement of one.
 | 0 | `Vendored.FinitePMF`, `Base` | the base types; nothing is proved |
 | 1 | `Basic` | the audited objects: the ledger, the deviation ball, admissibility |
 | 2 | `Telescope` | the ledger is exact; a closed path nets zero |
+| 2½ | `CyberneticCocycle` | an independently given change law composes exactly iff it is a potential difference; clipping breaks closed-loop cancellation |
 | 3 | `FiniteAudit` | the slack: `2Δ`, uniformly in the horizon and the policy |
 | 4 | `FiniteExperts` | the slack gets a number, and B7 enters |
 | 5 | `StructuralAudit` | the envelope may be random and the audit may not see it |
@@ -90,7 +93,7 @@ statement or proof.
 | 17 | `AuditCPRL.BellmanLadder` | a predeclared Q-function ladder on one panel: horizon-free finite-sample bound |
 | 18 | `AuditCPRL.ReusedPanel` | policy improvement on a reused panel pays the class term once; one panel, every horizon |
 | 19 | `AuditCPRL.SelfModification` | a learner closing its own dynamics on the audit is charged the pre-committed envelope only |
-| 20 | `AuditCPRL.Concealment` | per-step marginal tests cannot certify concealment in a POMDP |
+| 20 | `AuditCPRL.Concealment` | per-step marginal tests cannot establish concealment in a POMDP |
 | 21 | `AuditCPRL.Occupancy` | state aggregation is a garbling and can reverse signed occupancy progress |
 | 22 | `AuditCPRL.IntrinsicBudget` | an audited intrinsic reward is kernel-budgeted and cannot farm noise |
 | 23 | `AuditCPRL.Disclosure` | disclosure and sample size exchange on the audit channel |
@@ -98,8 +101,7 @@ statement or proof.
 | 25 | `AuditCPRL.Milestone` | the number of demonstrable milestones a world can pay for |
 ## Scope
 
-This root contains no belief-random-set, whole-model, NIP, Choquet, or model-theoretic
-identification development; those live under `AuditCP.Next`.  Because chapters 13 to 25 import `RLTheory`, this root no longer builds as a standalone Mathlib-only
+Because chapters 13 to 25 import `RLTheory`, this root does not build as a standalone Mathlib-only
 package; that is by design.  The vocabulary is deliberate
 throughout: the audit yields a *slack* and a *lower bound on improvement*, never a certificate.
 -/

@@ -9,10 +9,10 @@ the sealed-audit interface results to the reported instrument. `AuditCPRL` carri
 argument into reinforcement learning.
 
 Dependencies. Mathlib is pinned to an exact commit. `RLTheory` is Shangtong Zhang's
-`rl-theory-in-lean` (MIT; see RLTheory-LICENSE and the README), vendored here because the
-published upstream targets Lean v4.22 while this development targets v4.31. The vendored
-copy is a forward port: no upstream declaration is removed or restated, and every result
-`AuditCPRL` cites exists upstream under the same name.
+`rl-theory-in-lean` (MIT; see RLTheory-LICENSE and the README), vendored from upstream commit
+fa1c276240ff4502d2d06a3b95591ca5991c3fe4 (2026-02-05, Lean v4.28.0-rc1). The vendored copy has
+the same 33 Lean files as that commit; 14 are byte-identical to it and 19 are modified here. The
+copy builds against the Lean v4.31.0 toolchain and the Mathlib commit pinned below.
 
 The finite-PMF and cross-entropy layer in AuditCP/Vendored/FinitePMF.lean is copied and
 cited from the author's prior Lean development rather than required.

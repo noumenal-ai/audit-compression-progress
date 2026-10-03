@@ -1,0 +1,62 @@
+{
+  "c1": {
+    "experiment": "C1_curriculum_reward_ablation",
+    "by_policy": {
+      "audit_cp": {
+        "final_fresh_floored_ce": 1.7573663900366385,
+        "final_active_cell_acc": 0.375971332162155,
+        "final_exact_grid_acc": 0.023518880208333332,
+        "distractor_fraction": 0.2348,
+        "cumulative_audit_cp": 0.7542260119593514
+      },
+      "prediction_error": {
+        "final_fresh_floored_ce": 1.7850586924788896,
+        "final_active_cell_acc": 0.36562901715411816,
+        "final_exact_grid_acc": 0.015706380208333332,
+        "distractor_fraction": 0.4874,
+        "cumulative_audit_cp": null
+      },
+      "rnd": {
+        "final_fresh_floored_ce": 1.723960064651414,
+        "final_active_cell_acc": 0.39243007732629087,
+        "final_exact_grid_acc": 0.020670572916666668,
+        "distractor_fraction": 0.2518,
+        "cumulative_audit_cp": null
+      },
+      "icm": {
+        "final_fresh_floored_ce": 1.760488856568128,
+        "final_active_cell_acc": 0.37231383323679146,
+        "final_exact_grid_acc": 0.016927083333333332,
+        "distractor_fraction": 0.1582,
+        "cumulative_audit_cp": null
+      },
+      "uniform": {
+        "final_fresh_floored_ce": 1.8205851489095333,
+        "final_active_cell_acc": 0.3691411939907279,
+        "final_exact_grid_acc": 0.024820963541666668,
+        "distractor_fraction": 0.2518,
+        "cumulative_audit_cp": null
+      },
+      "round_robin": {
+        "final_fresh_floored_ce": 1.7602188680322186,
+        "final_active_cell_acc": 0.3836455607836799,
+        "final_exact_grid_acc": 0.025472005208333332,
+        "distractor_fraction": 0.2496,
+        "cumulative_audit_cp": null
+      },
+      "oracle_learnable": {
+        "final_fresh_floored_ce": 1.771103084513831,
+        "final_active_cell_acc": 0.391997506435935,
+        "final_exact_grid_acc": 0.02880859375,
+        "distractor_fraction": 0.0,
+        "cumulative_audit_cp": null
+      }
+    },
+    "audit_cp_minus_curiosity_active_acc": {
+      "prediction_error": 0.01034231500803684,
+      "rnd": -0.01645874516413587,
+      "icm": 0.003657498925363545
+    },
+    "_wallclock_sec": 21252.93
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "e4a": {
+    "experiment": "E4a_white_box_memorization",
+    "by_n": [
+      {
+        "n_total": 24,
+        "empirical_progress": 2.4394853905821066,
+        "true_progress": -1.2084195579429378,
+        "memorization_gap": 3.700854048159801,
+        "false_positive_excess": 3.6479049485250443
+      },
+      {
+        "n_total": 144,
+        "empirical_progress": 2.5226070719391838,
+        "true_progress": -1.1928499006888185,
+        "memorization_gap": 3.6708292262683506,
+        "false_positive_excess": 3.7154569726280022
+      }
+    ],
+    "_wallclock_sec": 5703.92
+  }
+}

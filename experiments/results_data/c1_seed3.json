@@ -1,0 +1,62 @@
+{
+  "c1": {
+    "experiment": "C1_curriculum_reward_ablation",
+    "by_policy": {
+      "audit_cp": {
+        "final_fresh_floored_ce": 1.7483288052983927,
+        "final_active_cell_acc": 0.37290742718260417,
+        "final_exact_grid_acc": 0.026529947916666668,
+        "distractor_fraction": 0.2466,
+        "cumulative_audit_cp": 0.8614744375617323
+      },
+      "prediction_error": {
+        "final_fresh_floored_ce": 1.8797373110168756,
+        "final_active_cell_acc": 0.3469107067999238,
+        "final_exact_grid_acc": 0.017171223958333332,
+        "distractor_fraction": 0.5572,
+        "cumulative_audit_cp": null
+      },
+      "rnd": {
+        "final_fresh_floored_ce": 1.7313241538538175,
+        "final_active_cell_acc": 0.3756689268707243,
+        "final_exact_grid_acc": 0.021321614583333332,
+        "distractor_fraction": 0.2712,
+        "cumulative_audit_cp": null
+      },
+      "icm": {
+        "final_fresh_floored_ce": 1.7769101104157285,
+        "final_active_cell_acc": 0.3606401511557724,
+        "final_exact_grid_acc": 0.018798828125,
+        "distractor_fraction": 0.1914,
+        "cumulative_audit_cp": null
+      },
+      "uniform": {
+        "final_fresh_floored_ce": 1.8083332380212986,
+        "final_active_cell_acc": 0.37271161909068334,
+        "final_exact_grid_acc": 0.026529947916666668,
+        "distractor_fraction": 0.2498,
+        "cumulative_audit_cp": null
+      },
+      "round_robin": {
+        "final_fresh_floored_ce": 1.7657786937239428,
+        "final_active_cell_acc": 0.38530120465713735,
+        "final_exact_grid_acc": 0.024495442708333332,
+        "distractor_fraction": 0.2496,
+        "cumulative_audit_cp": null
+      },
+      "oracle_learnable": {
+        "final_fresh_floored_ce": 1.7000416999331032,
+        "final_active_cell_acc": 0.41167473786275804,
+        "final_exact_grid_acc": 0.036946614583333336,
+        "distractor_fraction": 0.0,
+        "cumulative_audit_cp": null
+      }
+    },
+    "audit_cp_minus_curiosity_active_acc": {
+      "prediction_error": 0.02599672038268036,
+      "rnd": -0.002761499688120117,
+      "icm": 0.012267276026831753
+    },
+    "_wallclock_sec": 20770.93
+  }
+}

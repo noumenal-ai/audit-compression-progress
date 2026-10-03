@@ -1,0 +1,27 @@
+{
+  "e1": {
+    "experiment": "E1_stream_audit_gap",
+    "by_k": [
+      {
+        "k": 0.0,
+        "cum_stream_cp": 26.60662416030359,
+        "cum_fresh_audit_cp": 0.5135460262555616,
+        "gamma_SA": 26.093078134048028
+      },
+      {
+        "k": 0.5,
+        "cum_stream_cp": 31.93654921632479,
+        "cum_fresh_audit_cp": 0.5283159049806345,
+        "gamma_SA": 31.408233311344155
+      },
+      {
+        "k": 1.0,
+        "cum_stream_cp": 8.212547775029707,
+        "cum_fresh_audit_cp": -0.08493958760122933,
+        "gamma_SA": 8.297487362630935
+      }
+    ],
+    "gamma_SA_slope_in_k": -17.795590771417093,
+    "_wallclock_sec": 17778.93
+  }
+}

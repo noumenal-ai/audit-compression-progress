@@ -1,0 +1,140 @@
+{
+  "e7cal": {
+    "experiment": "E7_power_calibration (cells=1 special case of run_e7)",
+    "n": 200,
+    "C": 10,
+    "naive_sweep": [
+      {
+        "attacker": "boosting",
+        "defense": "naive",
+        "Q": 500,
+        "g_a": 1,
+        "dim": 2000,
+        "card_A": 4000,
+        "reusable_cp": 0.2063703628765836,
+        "fresh_cp": -0.06362963712341685,
+        "gap": 0.27000000000000046,
+        "threshold_2delta": 1.5941426425840346,
+        "delta_n_reusable": 0.7970713212920173,
+        "attacker_wins": false,
+        "reusable_crosses": false
+      },
+      {
+        "attacker": "boosting",
+        "defense": "naive",
+        "Q": 2000,
+        "g_a": 1,
+        "dim": 2000,
+        "card_A": 4000,
+        "reusable_cp": 0.8038667644317512,
+        "fresh_cp": -0.15113323556824865,
+        "gap": 0.9549999999999998,
+        "threshold_2delta": 1.5941426425840346,
+        "delta_n_reusable": 0.7970713212920173,
+        "attacker_wins": false,
+        "reusable_crosses": true
+      },
+      {
+        "attacker": "boosting",
+        "defense": "naive",
+        "Q": 8000,
+        "g_a": 1,
+        "dim": 2000,
+        "card_A": 8001,
+        "reusable_cp": 2.023094554985543,
+        "fresh_cp": -1.1547568498594774,
+        "gap": 3.17785140484502,
+        "threshold_2delta": 1.6396088258528083,
+        "delta_n_reusable": 0.8198044129264042,
+        "attacker_wins": true,
+        "reusable_crosses": true
+      }
+    ],
+    "defenses_at_maxQ": [
+      {
+        "attacker": "boosting",
+        "defense": "naive",
+        "Q": 8000,
+        "g_a": 1,
+        "dim": 2000,
+        "card_A": 8001,
+        "reusable_cp": 2.023094554985543,
+        "fresh_cp": -1.1547568498594774,
+        "gap": 3.17785140484502,
+        "threshold_2delta": 1.6396088258528083,
+        "delta_n_reusable": 0.8198044129264042,
+        "attacker_wins": true,
+        "reusable_crosses": true
+      },
+      {
+        "attacker": "boosting",
+        "defense": "fresh_subsample",
+        "Q": 8000,
+        "g_a": 1,
+        "dim": 2000,
+        "card_A": 8001,
+        "reusable_cp": 0.912733197701014,
+        "fresh_cp": -0.3172668022989864,
+        "gap": 1.2300000000000004,
+        "threshold_2delta": 1.6396088258528083,
+        "delta_n_reusable": 0.8198044129264042,
+        "attacker_wins": false,
+        "reusable_crosses": true
+      },
+      {
+        "attacker": "boosting",
+        "defense": "ladder",
+        "Q": 8000,
+        "g_a": 1,
+        "dim": 2000,
+        "card_A": 8001,
+        "reusable_cp": 0.0,
+        "fresh_cp": 0.0,
+        "gap": 0.0,
+        "threshold_2delta": 1.6396088258528083,
+        "delta_n_reusable": 0.8198044129264042,
+        "attacker_wins": false,
+        "reusable_crosses": false
+      },
+      {
+        "attacker": "boosting",
+        "defense": "rounded",
+        "Q": 8000,
+        "g_a": 1,
+        "dim": 2000,
+        "card_A": 8001,
+        "reusable_cp": 0.0,
+        "fresh_cp": 0.0,
+        "gap": 0.0,
+        "threshold_2delta": 1.6396088258528083,
+        "delta_n_reusable": 0.8198044129264042,
+        "attacker_wins": false,
+        "reusable_crosses": false
+      },
+      {
+        "attacker": "boosting",
+        "defense": "one_shot",
+        "Q": 8000,
+        "g_a": 1,
+        "dim": 2000,
+        "card_A": 8001,
+        "reusable_cp": 0.0,
+        "fresh_cp": 0.0,
+        "gap": 0.0,
+        "threshold_2delta": 1.6396088258528083,
+        "delta_n_reusable": 0.8198044129264042,
+        "attacker_wins": false,
+        "reusable_crosses": false
+      }
+    ],
+    "HAS_POWER": true,
+    "gap_grows_with_Q": true,
+    "defenses_below_threshold": [
+      "fresh_subsample",
+      "ladder",
+      "rounded",
+      "one_shot"
+    ],
+    "_wallclock_sec": 2.85
+  }
+}

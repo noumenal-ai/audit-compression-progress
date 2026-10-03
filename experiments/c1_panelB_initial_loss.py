@@ -64,9 +64,8 @@ Usage
 Writes `results_data/c1_panelB_initial_loss.json`, saving after every seed so an
 interrupted run resumes.
 
-The terminal levels L_B(theta_T) are read back from the C1 shards. On a clean checkout
-those live inside `dist/auditcp_experiments.zip`, which this script reads directly; if you
-have already unpacked them into `results_data/`, those files win.
+The terminal levels L_B(theta_T) are read back from the C1 shards in
+`results_data/c1_seed<S>.json`.
 """
 from __future__ import annotations
 
@@ -75,14 +74,11 @@ import json
 import math
 import sys
 import traceback
-import zipfile
 from pathlib import Path
 from typing import Dict, List, Optional
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE.parent
 RESULTS_DIR = HERE / "results_data"
-DIST_ZIP = REPO / "dist" / "auditcp_experiments.zip"
 OUT_JSON = RESULTS_DIR / "c1_panelB_initial_loss.json"
 
 sys.path.insert(0, str(HERE))
@@ -119,14 +115,9 @@ VALIDATION_TARGET = {
 def load_LT(seed: int) -> float:
     """Terminal audit level of the audit_cp policy on panel B, from the C1 shard."""
     loose = RESULTS_DIR / f"c1_seed{seed}.json"
-    if loose.exists():
-        shard = json.loads(loose.read_text())
-    elif DIST_ZIP.exists():
-        with zipfile.ZipFile(DIST_ZIP) as z:
-            shard = json.loads(z.read(f"auditcp_experiments/results_data/c1_seed{seed}.json"))
-    else:
-        raise FileNotFoundError(
-            f"no C1 shard for seed {seed}: expected {loose} or {DIST_ZIP}")
+    if not loose.exists():
+        raise FileNotFoundError(f"no C1 shard for seed {seed}: expected {loose}")
+    shard = json.loads(loose.read_text())
     return float(shard["c1"]["by_policy"]["audit_cp"]["final_fresh_floored_ce"])
 
 

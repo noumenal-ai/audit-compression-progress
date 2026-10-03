@@ -1,0 +1,62 @@
+{
+  "c1": {
+    "experiment": "C1_curriculum_reward_ablation",
+    "by_policy": {
+      "audit_cp": {
+        "final_fresh_floored_ce": 1.7652978200273863,
+        "final_active_cell_acc": 0.3827935605997242,
+        "final_exact_grid_acc": 0.026123046875,
+        "distractor_fraction": 0.243,
+        "cumulative_audit_cp": 0.6692818589010616
+      },
+      "prediction_error": {
+        "final_fresh_floored_ce": 1.8283145169136221,
+        "final_active_cell_acc": 0.36857664201829793,
+        "final_exact_grid_acc": 0.013590494791666666,
+        "distractor_fraction": 0.5436,
+        "cumulative_audit_cp": null
+      },
+      "rnd": {
+        "final_fresh_floored_ce": 1.7185381164194788,
+        "final_active_cell_acc": 0.37414176235725033,
+        "final_exact_grid_acc": 0.024007161458333332,
+        "distractor_fraction": 0.2414,
+        "cumulative_audit_cp": null
+      },
+      "icm": {
+        "final_fresh_floored_ce": 1.7793091463493864,
+        "final_active_cell_acc": 0.35766654377053797,
+        "final_exact_grid_acc": 0.018473307291666668,
+        "distractor_fraction": 0.1812,
+        "cumulative_audit_cp": null
+      },
+      "uniform": {
+        "final_fresh_floored_ce": 1.7772549201047905,
+        "final_active_cell_acc": 0.3813301821962988,
+        "final_exact_grid_acc": 0.028076171875,
+        "distractor_fraction": 0.2376,
+        "cumulative_audit_cp": null
+      },
+      "round_robin": {
+        "final_fresh_floored_ce": 1.8120014867076437,
+        "final_active_cell_acc": 0.359591619063933,
+        "final_exact_grid_acc": 0.025634765625,
+        "distractor_fraction": 0.2496,
+        "cumulative_audit_cp": null
+      },
+      "oracle_learnable": {
+        "final_fresh_floored_ce": 1.725156973671485,
+        "final_active_cell_acc": 0.3869220675723509,
+        "final_exact_grid_acc": 0.031656901041666664,
+        "distractor_fraction": 0.0,
+        "cumulative_audit_cp": null
+      }
+    },
+    "audit_cp_minus_curiosity_active_acc": {
+      "prediction_error": 0.014216918581426263,
+      "rnd": 0.008651798242473863,
+      "icm": 0.02512701682918622
+    },
+    "_wallclock_sec": 21140.78
+  }
+}
